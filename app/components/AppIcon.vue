@@ -1,10 +1,22 @@
 <script setup lang="ts">
 const { name } = defineProps<{
-  name: 'plus' | 'check' | 'trash' | 'arrow-left' | 'arrow-right' | 'notebook' | 'list' | 'warning'
+  name:
+    | 'plus'
+    | 'check'
+    | 'trash'
+    | 'arrow-left'
+    | 'arrow-right'
+    | 'notebook'
+    | 'list'
+    | 'warning'
+    | 'undo'
+    | 'redo'
 }>()
 
 const paths = {
   plus: 'M12 5v14M5 12h14',
+  undo: 'm9 4-6 6 6 6M3 10h11a6 6 0 0 1 0 12h-3',
+  redo: 'm15 4 6 6-6 6m6-6H10a6 6 0 0 0 0 12h3',
   warning: 'm12 3 10 18H2L12 3Zm0 6v5m0 3h.01',
   check: 'm5 12 4 4L19 6',
   trash: 'M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6',

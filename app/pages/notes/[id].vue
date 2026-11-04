@@ -167,6 +167,7 @@ useHead({
       v-else-if="initialNote"
       :initial-note="initialNote"
       :can-delete="!isNew"
+      :history-paused="confirmation !== null"
       @save="saveNote"
       @cancel="confirmation = 'cancel'"
       @delete="confirmation = 'delete'"

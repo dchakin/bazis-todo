@@ -154,6 +154,13 @@ body {
     width: $control-min-height;
     padding: $space-xs;
   }
+
+  &:disabled {
+    border-color: $color-border;
+    color: $color-text-muted;
+    background-color: $color-background;
+    cursor: default;
+  }
 }
 
 .field {

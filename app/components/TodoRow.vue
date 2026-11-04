@@ -15,6 +15,7 @@ const completed = defineModel<boolean>('completed', {
 
 const emit = defineEmits<{
   remove: []
+  blur: []
 }>()
 
 const textInput = useTemplateRef('textInput')
@@ -92,6 +93,7 @@ const inputId = computed(() => {
       required
       :aria-invalid="invalid || undefined"
       :aria-describedby="invalid ? `${inputId}-error` : undefined"
+      @blur="emit('blur')"
     />
 
     <button

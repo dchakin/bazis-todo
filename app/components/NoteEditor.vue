@@ -2,9 +2,10 @@
 import type { NoteContent } from '~/types/note'
 import { createTodo } from '~/utils/notes'
 
-const { initialNote, canDelete } = defineProps<{
+const { initialNote, canDelete, historyPaused } = defineProps<{
   initialNote: NoteContent
   canDelete: boolean
+  historyPaused: boolean
 }>()
 
 const emit = defineEmits<{
@@ -27,6 +28,8 @@ const draft = reactive<NoteContent>({
 const submitted = ref(false)
 const form = useTemplateRef('form')
 const titleId = useId()
+const history = useNoteHistory(draft)
+const { canUndo, canRedo } = history
 
 const titleInvalid = computed(() => {
   return submitted.value && !draft.title.trim()
@@ -41,7 +44,7 @@ const completedCount = computed(() => {
 async function addTodo() {
   const todo = createTodo()
 
-  draft.todos.push(todo)
+  history.addTodo(todo)
 
   await nextTick()
 
@@ -53,7 +56,11 @@ async function removeTodo(id: string) {
     return todo.id === id
   })
 
-  draft.todos.splice(index, 1)
+  if (index === -1) {
+    return
+  }
+
+  history.removeTodo(id)
 
   await nextTick()
 
@@ -66,6 +73,8 @@ async function removeTodo(id: string) {
 }
 
 async function saveNote() {
+  history.finishTextEdit()
+
   submitted.value = true
 
   const hasEmptyTodo = draft.todos.some((todo) => {
@@ -91,6 +100,74 @@ async function saveNote() {
     }),
   })
 }
+
+function updateTitle(event: Event) {
+  history.updateTitle((event.target as HTMLInputElement).value)
+}
+
+function cancelEditing() {
+  history.finishTextEdit()
+
+  emit('cancel')
+}
+
+function deleteNote() {
+  history.finishTextEdit()
+
+  emit('delete')
+}
+
+function handleHistoryShortcut(event: KeyboardEvent) {
+  const isHistoryKey = event.code === 'KeyZ' || event.key.toLowerCase() === 'z'
+
+  if (
+    historyPaused ||
+    event.defaultPrevented ||
+    event.isComposing ||
+    !event.ctrlKey ||
+    event.altKey ||
+    event.metaKey ||
+    !isHistoryKey
+  ) {
+    return
+  }
+
+  const target = event.target
+  const isTextInput =
+    target instanceof HTMLElement &&
+    (target.closest('input, textarea') !== null || target.isContentEditable)
+
+  if (isTextInput) {
+    return
+  }
+
+  event.preventDefault()
+
+  if (event.shiftKey) {
+    history.redo()
+  } else {
+    history.undo()
+  }
+}
+
+watch(
+  () => historyPaused,
+  (paused) => {
+    if (paused) {
+      history.finishTextEdit()
+    }
+  },
+)
+
+onMounted(() => {
+  window.addEventListener('keydown', handleHistoryShortcut)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleHistoryShortcut)
+
+  history.reset()
+})
 </script>
 
 <template>
@@ -100,6 +177,38 @@ async function saveNote() {
     novalidate
     @submit.prevent="saveNote"
   >
+    <div
+      class="note-editor__history"
+      role="group"
+      aria-label="История изменений"
+    >
+      <button
+        class="button button--secondary note-editor__history-action"
+        type="button"
+        :disabled="!canUndo"
+        aria-label="Отменить изменение"
+        aria-keyshortcuts="Control+Z"
+        title="Отменить изменение (Ctrl+Z вне текстового поля)"
+        @click="history.undo"
+      >
+        <AppIcon name="undo" />
+        Отменить
+      </button>
+
+      <button
+        class="button button--secondary note-editor__history-action"
+        type="button"
+        :disabled="!canRedo"
+        aria-label="Повторить изменение"
+        aria-keyshortcuts="Control+Shift+Z"
+        title="Повторить изменение (Ctrl+Shift+Z вне текстового поля)"
+        @click="history.redo"
+      >
+        <AppIcon name="redo" />
+        Повторить
+      </button>
+    </div>
+
     <div class="field">
       <label
         class="field__label"
@@ -110,13 +219,15 @@ async function saveNote() {
 
       <input
         :id="titleId"
-        v-model="draft.title"
+        :value="draft.title"
         class="field__input note-editor__title-input"
         type="text"
         placeholder="Например, планы на неделю"
         required
         :aria-invalid="titleInvalid || undefined"
         :aria-describedby="titleInvalid ? `${titleId}-error` : undefined"
+        @input="updateTitle"
+        @blur="history.finishTextEdit"
       />
 
       <p
@@ -152,11 +263,14 @@ async function saveNote() {
         <TodoRow
           v-for="(todo, index) in draft.todos"
           :key="todo.id"
-          v-model:text="todo.text"
-          v-model:completed="todo.completed"
+          :text="todo.text"
+          :completed="todo.completed"
           :todo-id="todo.id"
           :index="index"
           :invalid="submitted && !todo.text.trim()"
+          @update:text="history.updateTodoText(todo.id, $event)"
+          @update:completed="history.setTodoCompleted(todo.id, $event)"
+          @blur="history.finishTextEdit"
           @remove="removeTodo(todo.id)"
         />
       </ul>
@@ -195,7 +309,7 @@ async function saveNote() {
           class="button button--quiet note-editor__action"
           type="button"
           aria-label="Отменить редактирование"
-          @click="emit('cancel')"
+          @click="cancelEditing"
         >
           Отменить
         </button>
@@ -206,7 +320,7 @@ async function saveNote() {
         class="button button--danger-quiet note-editor__delete"
         type="button"
         aria-label="Удалить заметку"
-        @click="emit('delete')"
+        @click="deleteNote"
       >
         <AppIcon name="trash" />
         Удалить
@@ -226,6 +340,21 @@ async function saveNote() {
   border-radius: $radius-lg;
   background-color: $color-surface;
   box-shadow: $shadow-surface;
+
+  &__history {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-xs;
+  }
+
+  &__history-action {
+    flex: 1;
+    gap: $space-2xs;
+    min-width: 0;
+    padding-inline: $space-2xs;
+    font-size: $font-size-sm;
+    white-space: nowrap;
+  }
 
   &__title-input {
     font-size: $font-size-lg;

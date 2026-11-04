@@ -354,3 +354,118 @@ describe('notes store', () => {
     expect(storage.setItem).not.toHaveBeenCalled()
   })
 })
+
+describe('storage events', () => {
+  function event(key: string | null, area: unknown = storage): StorageEvent {
+    return {
+      key,
+      storageArea: area,
+    } as StorageEvent
+  }
+
+  it.each([NOTES_STORAGE_KEY, null])(
+    'reloads notes after external deletion or clear: %s',
+    (key) => {
+      writeNotes([first, second])
+
+      const store = useNotesStore()
+
+      store.loadNotes()
+
+      if (key === null) {
+        storage.removeItem(NOTES_STORAGE_KEY)
+      } else {
+        writeNotes([second])
+      }
+
+      storage.setItem.mockClear()
+
+      expect(store.handleStorageEvent(event(key))?.ok).toBe(true)
+      expect(store.getNote(first.id)).toBeUndefined()
+      expect(store.notes).toEqual(key === null ? [] : [second])
+      expect(storage.setItem).not.toHaveBeenCalled()
+    },
+  )
+
+  it('keeps the current note when only another note was deleted', () => {
+    writeNotes([first, second])
+
+    const store = useNotesStore()
+
+    store.loadNotes()
+    writeNotes([first])
+
+    expect(store.handleStorageEvent(event(NOTES_STORAGE_KEY))?.ok).toBe(true)
+    expect(store.getNote(first.id)).toEqual(first)
+    expect(store.getNote(second.id)).toBeUndefined()
+  })
+
+  it('ignores unrelated keys and session storage events', () => {
+    writeNotes([first])
+
+    const store = useNotesStore()
+
+    store.loadNotes()
+    storage.removeItem(NOTES_STORAGE_KEY)
+    storage.getItem.mockClear()
+
+    expect(store.handleStorageEvent(event('other-key'))).toBeNull()
+    expect(store.handleStorageEvent(event(NOTES_STORAGE_KEY, createTestStorage()))).toBeNull()
+    expect(storage.getItem).not.toHaveBeenCalled()
+    expect(store.getNote(first.id)).toEqual(first)
+  })
+
+  it('reads current storage for queued events rather than relying on their old payload', () => {
+    const store = useNotesStore()
+    const queuedEvent = event(NOTES_STORAGE_KEY)
+
+    writeNotes([second])
+    writeNotes([first, second])
+
+    expect(store.handleStorageEvent(queuedEvent)?.ok).toBe(true)
+    expect(store.getNote(first.id)).toEqual(first)
+  })
+
+  it('shows errors for malformed external data without treating the note as deleted', () => {
+    writeNotes([first])
+
+    const store = useNotesStore()
+
+    store.loadNotes()
+    storage.setItem(NOTES_STORAGE_KEY, '{broken')
+
+    expect(store.handleStorageEvent(event(NOTES_STORAGE_KEY))).toMatchObject({
+      ok: false,
+      error: {
+        code: NOTES_ERROR_CODES.invalidData,
+      },
+    })
+    expect(store.getNote(first.id)).toEqual(first)
+    expect(storage.getItem(NOTES_STORAGE_KEY)).toBe('{broken')
+  })
+
+  it('reports a denied storage getter without throwing or losing loaded notes', () => {
+    writeNotes([first])
+
+    const store = useNotesStore()
+    const incoming = event(NOTES_STORAGE_KEY)
+
+    store.loadNotes()
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      get() {
+        throw new DOMException('Blocked', 'SecurityError')
+      },
+    })
+
+    expect(store.handleStorageEvent(incoming)).toMatchObject({
+      ok: false,
+      error: {
+        code: NOTES_ERROR_CODES.readFailed,
+      },
+    })
+    expect(store.getNote(first.id)).toEqual(first)
+    expect(store.handleStorageEvent(event('other-key'))).toBeNull()
+  })
+})

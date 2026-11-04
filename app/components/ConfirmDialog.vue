@@ -1,10 +1,15 @@
 <script setup lang="ts">
-const { cancelLabel = 'Отменить', danger = true } = defineProps<{
+const {
+  cancelLabel = 'Отменить',
+  danger = true,
+  initialFocus = 'cancel',
+} = defineProps<{
   title: string
   message: string
   confirmLabel: string
   cancelLabel?: string
   danger?: boolean
+  initialFocus?: 'cancel' | 'title'
 }>()
 
 const emit = defineEmits<{
@@ -13,6 +18,7 @@ const emit = defineEmits<{
 }>()
 
 const dialog = useTemplateRef('dialog')
+const titleElement = useTemplateRef('titleElement')
 const cancelButton = useTemplateRef('cancelButton')
 const confirmButton = useTemplateRef('confirmButton')
 const titleId = useId()
@@ -29,7 +35,13 @@ function trapFocus(event: KeyboardEvent) {
   const first = cancelButton.value?.element
   const last = confirmButton.value?.element
 
-  if (event.shiftKey && document.activeElement === first) {
+  if (document.activeElement === titleElement.value) {
+    event.preventDefault()
+
+    const target = event.shiftKey ? last : first
+
+    target?.focus()
+  } else if (event.shiftKey && document.activeElement === first) {
     event.preventDefault()
     last?.focus()
   } else if (!event.shiftKey && document.activeElement === last) {
@@ -39,12 +51,21 @@ function trapFocus(event: KeyboardEvent) {
 }
 
 onMounted(() => {
-  previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
+  const activeElement = document.activeElement
+
+  previousFocus =
+    activeElement instanceof HTMLElement && activeElement !== document.body ? activeElement : null
+
   previousOverflow = document.body.style.overflow
   document.body.style.overflow = 'hidden'
 
   dialog.value?.showModal()
-  cancelButton.value?.focus()
+
+  if (initialFocus === 'title') {
+    titleElement.value?.focus()
+  } else {
+    cancelButton.value?.focus()
+  }
 })
 
 onBeforeUnmount(() => {
@@ -79,7 +100,10 @@ onBeforeUnmount(() => {
 
     <h2
       :id="titleId"
+      ref="titleElement"
       class="confirm-dialog__title"
+      :tabindex="initialFocus === 'title' ? -1 : undefined"
+      :autofocus="initialFocus === 'title'"
     >
       {{ title }}
     </h2>
@@ -95,7 +119,7 @@ onBeforeUnmount(() => {
       <UiButton
         ref="cancelButton"
         variant="secondary"
-        autofocus
+        :autofocus="initialFocus === 'cancel'"
         @click="emit('cancel')"
       >
         {{ cancelLabel }}
@@ -147,6 +171,10 @@ onBeforeUnmount(() => {
     margin: 0;
     font-size: $font-size-xl;
     line-height: $line-height-title;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   &__message {

@@ -9,6 +9,7 @@ const { initialNote, canDelete, historyPaused } = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  change: [note: NoteContent]
   save: [note: NoteContent]
   cancel: []
   delete: []
@@ -29,6 +30,16 @@ const submitted = ref(false)
 const form = useTemplateRef('form')
 const history = useNoteHistory(draft)
 const { canUndo, canRedo } = history
+
+watch(
+  draft,
+  () => {
+    emit('change', draft)
+  },
+  {
+    flush: 'sync',
+  },
+)
 
 const titleError = computed(() => {
   return submitted.value && !draft.title.trim() ? 'Введите название заметки.' : undefined

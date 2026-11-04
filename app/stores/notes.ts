@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Note, NoteContent, NotesError, NotesResult } from '../types/note'
 import { copyNote } from '../utils/notes'
-import { readNotes, writeNotes } from '../utils/notes-storage'
+import { NOTES_STORAGE_KEY, readNotes, writeNotes } from '../utils/notes-storage'
 
 export const useNotesStore = defineStore('notes', () => {
   const notes = ref<Note[]>([])
@@ -33,6 +33,22 @@ export const useNotesStore = defineStore('notes', () => {
     })
 
     return note ? copyNote(note) : undefined
+  }
+
+  function handleStorageEvent(event: StorageEvent): NotesResult<void> | null {
+    if (event.key !== NOTES_STORAGE_KEY && event.key !== null) {
+      return null
+    }
+
+    try {
+      if (event.storageArea !== localStorage) {
+        return null
+      }
+    } catch {
+      return loadNotes()
+    }
+
+    return loadNotes()
   }
 
   function persistNotes(nextNotes: Note[]): NotesResult<void> {
@@ -152,6 +168,7 @@ export const useNotesStore = defineStore('notes', () => {
     error,
     loadNotes,
     getNote,
+    handleStorageEvent,
     createNote,
     updateNote,
     deleteNote,

@@ -14,7 +14,31 @@ const noteId = String(route.params.id)
 const isNew = noteId === 'new'
 const initialNote = ref<NoteContent | null>(null)
 const missing = ref(false)
-const confirmation = ref<'cancel' | 'delete' | null>(null)
+const externallyDeleted = ref(false)
+const confirmation = ref<'cancel' | 'delete' | 'restore' | null>(null)
+const recoveryNote = ref<NoteContent | null>(null)
+const completionMessage = ref<string | null>(null)
+const completionTitle = useTemplateRef('completionTitle')
+const draft = useNoteDraft(isNew ? null : noteId)
+const { error: draftError } = draft
+
+const missingTitle = computed(() => {
+  return externallyDeleted.value ? 'Заметка удалена' : 'Заметка не найдена'
+})
+
+const missingDescription = computed(() => {
+  return externallyDeleted.value
+    ? 'Эту заметку удалили в другой вкладке. Вернитесь к списку заметок.'
+    : 'Возможно, она была удалена. Вернитесь к списку заметок.'
+})
+
+const recoveryMessage = computed(() => {
+  return (
+    storageError.value?.message ??
+    draftError.value?.message ??
+    'В этой вкладке остались несохранённые изменения.'
+  )
+})
 
 const pageTitle = computed(() => {
   return isNew ? 'Новая заметка' : 'Редактирование заметки'
@@ -42,15 +66,91 @@ function loadEditor() {
       title: '',
       todos: [],
     }
+  } else {
+    initialNote.value = notesStore.getNote(noteId) ?? null
+  }
+
+  if (!initialNote.value) {
+    markMissing()
 
     return
   }
 
-  initialNote.value = notesStore.getNote(noteId) ?? null
-  missing.value = initialNote.value === null
+  recoveryNote.value = draft.load()
+
+  if (recoveryNote.value) {
+    confirmation.value = 'restore'
+  }
+}
+
+function markMissing(deleted = false) {
+  draft.stop()
+  draft.clear()
+
+  confirmation.value = null
+  recoveryNote.value = null
+  initialNote.value = null
+  missing.value = true
+  externallyDeleted.value = deleted
+}
+
+function handleStorageEvent(event: StorageEvent) {
+  const result = notesStore.handleStorageEvent(event)
+
+  if (result?.ok && !completionMessage.value && !isNew && !notesStore.getNote(noteId)) {
+    markMissing(true)
+  }
+}
+
+function restoreDraft() {
+  const result = notesStore.loadNotes()
+
+  if (!result.ok) {
+    return
+  }
+
+  if (!isNew && !notesStore.getNote(noteId)) {
+    markMissing(true)
+
+    return
+  }
+
+  initialNote.value = recoveryNote.value
+  recoveryNote.value = null
+  confirmation.value = null
+}
+
+function discardDraft() {
+  const result = notesStore.loadNotes()
+
+  if (!result.ok) {
+    return
+  }
+
+  const savedNote = isNew ? initialNote.value : notesStore.getNote(noteId)
+
+  if (!savedNote) {
+    markMissing(true)
+
+    return
+  }
+
+  if (!draft.clear()) {
+    return
+  }
+
+  initialNote.value = savedNote
+  recoveryNote.value = null
+  confirmation.value = null
 }
 
 async function returnToList() {
+  if (completionMessage.value) {
+    await clearDraftAndReturn()
+
+    return
+  }
+
   if (initialNote.value) {
     confirmation.value = 'cancel'
 
@@ -60,7 +160,33 @@ async function returnToList() {
   await navigateTo('/')
 }
 
+async function clearDraftAndReturn() {
+  if (!draft.clear()) {
+    await nextTick()
+
+    completionTitle.value?.focus()
+
+    return
+  }
+
+  await navigateTo('/')
+}
+
+async function completeEditing(message: string) {
+  draft.stop()
+
+  initialNote.value = null
+  recoveryNote.value = null
+  completionMessage.value = message
+
+  await clearDraftAndReturn()
+}
+
 async function saveNote(content: NoteContent) {
+  if (completionMessage.value) {
+    return
+  }
+
   const result = isNew
     ? notesStore.createNote(content)
     : notesStore.updateNote({
@@ -70,14 +196,13 @@ async function saveNote(content: NoteContent) {
 
   if (!result.ok) {
     if (result.error.code === NOTES_ERROR_CODES.notFound) {
-      missing.value = true
-      initialNote.value = null
+      markMissing(true)
     }
 
     return
   }
 
-  await navigateTo('/')
+  await completeEditing('Заметка сохранена')
 }
 
 async function confirmAction() {
@@ -85,25 +210,44 @@ async function confirmAction() {
 
   confirmation.value = null
 
+  if (!action || action === 'restore') {
+    return
+  }
+
   if (action === 'delete') {
     const result = notesStore.deleteNote(noteId)
 
     if (!result.ok) {
       if (result.error.code === NOTES_ERROR_CODES.notFound) {
-        missing.value = true
-        initialNote.value = null
+        markMissing(true)
       }
 
       return
     }
+
+    await completeEditing('Заметка удалена')
+
+    return
   }
 
-  if (action) {
-    await navigateTo('/')
+  if (!draft.clear()) {
+    return
   }
+
+  draft.stop()
+
+  await navigateTo('/')
 }
 
 loadEditor()
+
+onMounted(() => {
+  window.addEventListener('storage', handleStorageEvent)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('storage', handleStorageEvent)
+})
 
 useHead({
   title: computed(() => {
@@ -139,12 +283,41 @@ useHead({
     <StorageErrorNotice
       v-if="storageError"
       :message="storageError.message"
-      :can-retry="!initialNote"
+      :can-retry="!initialNote && !completionMessage"
       @retry="loadEditor"
     />
 
+    <StorageErrorNotice
+      v-if="draftError"
+      :message="draftError.message"
+      :can-retry="false"
+    />
+
     <div
-      v-if="missing"
+      v-if="completionMessage"
+      class="note-page__notice"
+      role="status"
+    >
+      <h2
+        ref="completionTitle"
+        class="note-page__notice-title"
+        tabindex="-1"
+      >
+        {{ completionMessage }}
+      </h2>
+
+      <UiButton
+        class="note-page__notice-action"
+        variant="secondary"
+        aria-label="Повторить удаление черновика"
+        @click="clearDraftAndReturn"
+      >
+        Повторить
+      </UiButton>
+    </div>
+
+    <div
+      v-else-if="missing"
       class="note-page__notice"
       role="status"
     >
@@ -152,9 +325,9 @@ useHead({
         <UiIcon name="notebook" />
       </span>
 
-      <h2 class="note-page__notice-title">Заметка не найдена</h2>
+      <h2 class="note-page__notice-title">{{ missingTitle }}</h2>
 
-      <p class="note-page__description">Возможно, она была удалена. Вернитесь к списку заметок.</p>
+      <p class="note-page__description">{{ missingDescription }}</p>
 
       <UiButton
         class="note-page__notice-action"
@@ -167,10 +340,11 @@ useHead({
     </div>
 
     <NoteEditor
-      v-else-if="initialNote"
+      v-else-if="initialNote && !recoveryNote"
       :initial-note="initialNote"
       :can-delete="!isNew"
       :history-paused="confirmation !== null"
+      @change="draft.schedule"
       @save="saveNote"
       @cancel="confirmation = 'cancel'"
       @delete="confirmation = 'delete'"
@@ -184,6 +358,18 @@ useHead({
       cancel-label="Продолжить"
       @confirm="confirmAction"
       @cancel="confirmation = null"
+    />
+
+    <ConfirmDialog
+      v-else-if="confirmation === 'restore'"
+      title="Восстановить черновик?"
+      :message="recoveryMessage"
+      confirm-label="Восстановить"
+      cancel-label="Отбросить"
+      initial-focus="title"
+      :danger="false"
+      @confirm="restoreDraft"
+      @cancel="discardDraft"
     />
 
     <ConfirmDialog
@@ -249,6 +435,10 @@ useHead({
   &__notice-title {
     margin: 0;
     font-size: $font-size-xl;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   &__notice-action {

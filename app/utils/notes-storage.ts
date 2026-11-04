@@ -1,44 +1,9 @@
 import { NOTES_ERROR_CODES } from '../constants/notes-errors'
-import type { Note, NotesContainer, NotesResult, Todo } from '../types/note'
+import type { Note, NotesContainer, NotesResult } from '../types/note'
 import { copyNote } from './notes'
+import { isNote, isRecord } from './note-validation'
 
 export const NOTES_STORAGE_KEY = 'bazis-todo:notes'
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-function isId(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0
-}
-
-function isTodo(value: unknown): value is Todo {
-  return (
-    isRecord(value) &&
-    isId(value.id) &&
-    typeof value.text === 'string' &&
-    typeof value.completed === 'boolean'
-  )
-}
-
-function isNote(value: unknown): value is Note {
-  if (
-    !isRecord(value) ||
-    !isId(value.id) ||
-    value.id === 'new' ||
-    typeof value.title !== 'string' ||
-    !Array.isArray(value.todos) ||
-    !value.todos.every(isTodo)
-  ) {
-    return false
-  }
-
-  const todoIds = value.todos.map((todo) => {
-    return todo.id
-  })
-
-  return new Set(todoIds).size === todoIds.length
-}
 
 function isNotesContainer(value: unknown): value is NotesContainer {
   if (

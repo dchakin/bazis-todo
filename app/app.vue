@@ -3,7 +3,7 @@
     <header class="app-shell__header">
       <div class="app-shell__brand">
         <span class="app-shell__mark">
-          <AppIcon name="notebook" />
+          <UiIcon name="notebook" />
         </span>
 
         Заметки

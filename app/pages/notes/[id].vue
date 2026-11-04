@@ -20,6 +20,12 @@ const pageTitle = computed(() => {
   return isNew ? 'Новая заметка' : 'Редактирование заметки'
 })
 
+const pageDescription = computed(() => {
+  return isNew
+    ? 'Дайте заметке название и добавьте задачи, если нужно.'
+    : 'Изменения сохранятся после нажатия «Сохранить».'
+})
+
 const storageError = computed(() => {
   return notesStore.error?.code !== NOTES_ERROR_CODES.notFound ? notesStore.error : null
 })
@@ -107,13 +113,13 @@ useHead({
 </script>
 
 <template>
-  <section class="page note-page">
+  <section class="note-page">
     <a
       class="note-page__back-link"
       href="/"
       @click.prevent="returnToList"
     >
-      <AppIcon name="arrow-left" />
+      <UiIcon name="arrow-left" />
       К списку заметок
     </a>
 
@@ -126,11 +132,7 @@ useHead({
       </h1>
 
       <p class="note-page__description">
-        {{
-          isNew
-            ? 'Дайте заметке название и добавьте задачи, если нужно.'
-            : 'Изменения сохранятся после нажатия «Сохранить».'
-        }}
+        {{ pageDescription }}
       </p>
     </header>
 
@@ -147,20 +149,21 @@ useHead({
       role="status"
     >
       <span class="note-page__notice-icon">
-        <AppIcon name="notebook" />
+        <UiIcon name="notebook" />
       </span>
 
       <h2 class="note-page__notice-title">Заметка не найдена</h2>
 
       <p class="note-page__description">Возможно, она была удалена. Вернитесь к списку заметок.</p>
 
-      <NuxtLink
-        class="button button--secondary note-page__notice-action"
+      <UiButton
+        class="note-page__notice-action"
+        variant="secondary"
         to="/"
         aria-label="На главную"
       >
         Вернуться
-      </NuxtLink>
+      </UiButton>
     </div>
 
     <NoteEditor

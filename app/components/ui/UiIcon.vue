@@ -29,7 +29,7 @@ const paths = {
 
 <template>
   <svg
-    class="app-icon"
+    class="ui-icon"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -46,9 +46,9 @@ const paths = {
 <style scoped lang="scss">
 @use '~/assets/styles/variables' as *;
 
-.app-icon {
+.ui-icon {
   flex-shrink: 0;
-  width: $icon-size;
-  height: $icon-size;
+  width: var(--ui-icon-size, #{$icon-size});
+  height: var(--ui-icon-size, #{$icon-size});
 }
 </style>

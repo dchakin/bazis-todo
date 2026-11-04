@@ -25,8 +25,6 @@ body {
 }
 
 .page {
-  min-width: 0;
-
   &__title {
     margin: 0;
     font-size: $font-size-2xl;
@@ -87,129 +85,6 @@ body {
       margin-bottom: $space-xl;
       padding-block: $space-md;
     }
-  }
-}
-
-.button {
-  font: inherit;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: $space-xs;
-  min-height: $control-min-height;
-  padding: $space-xs $space-md;
-  border: $border-width solid transparent;
-  border-radius: $radius-sm;
-  color: $color-surface;
-  background-color: $accent;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  font-weight: $font-weight-semibold;
-  overflow-wrap: anywhere;
-
-  &:hover {
-    background-color: $accent-hover;
-  }
-
-  &--secondary {
-    border-color: $color-border;
-    color: $color-text-secondary;
-    background-color: $color-surface;
-
-    &:hover {
-      background-color: $color-secondary-hover;
-    }
-  }
-
-  &--danger {
-    background-color: $color-danger;
-
-    &:hover {
-      background-color: $color-danger-hover;
-    }
-  }
-
-  &--quiet {
-    color: $color-text-secondary;
-    background-color: transparent;
-
-    &:hover {
-      color: $accent;
-      background-color: $color-accent-background;
-    }
-  }
-
-  &--danger-quiet {
-    color: $color-text-muted;
-    background-color: transparent;
-
-    &:hover {
-      color: $color-danger-text;
-      background-color: $color-danger-background;
-    }
-  }
-
-  &--icon {
-    width: $control-min-height;
-    padding: $space-xs;
-  }
-
-  &:disabled {
-    border-color: $color-border;
-    color: $color-text-muted;
-    background-color: $color-background;
-    cursor: default;
-  }
-}
-
-.field {
-  min-width: 0;
-
-  &__label {
-    display: block;
-    margin-bottom: $space-xs;
-    font-size: $font-size-sm;
-    font-weight: $font-weight-semibold;
-  }
-
-  &__input {
-    font: inherit;
-    display: block;
-    width: 100%;
-    min-width: 0;
-    min-height: $control-min-height;
-    padding: $space-xs $space-sm;
-    border: $border-width solid $color-input-border;
-    border-radius: $radius-sm;
-    color: inherit;
-    background-color: $color-surface;
-
-    &--plain {
-      border-color: transparent;
-      background-color: transparent;
-    }
-
-    &:focus {
-      outline: none;
-      border-color: $accent;
-      background-color: $color-surface;
-      box-shadow: 0 0 0 $focus-ring-width $color-focus-ring;
-    }
-
-    &[aria-invalid='true'] {
-      border-color: $color-danger;
-
-      &:focus {
-        box-shadow: 0 0 0 $focus-ring-width $color-danger-focus-ring;
-      }
-    }
-  }
-
-  &__error {
-    margin: $space-xs 0 0;
-    color: $color-danger-text;
-    font-size: $font-size-sm;
   }
 }
 

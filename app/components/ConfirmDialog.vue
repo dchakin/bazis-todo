@@ -26,8 +26,8 @@ function trapFocus(event: KeyboardEvent) {
     return
   }
 
-  const first = cancelButton.value
-  const last = confirmButton.value
+  const first = cancelButton.value?.element
+  const last = confirmButton.value?.element
 
   if (event.shiftKey && document.activeElement === first) {
     event.preventDefault()
@@ -74,7 +74,7 @@ onBeforeUnmount(() => {
       class="confirm-dialog__icon"
       :class="danger ? 'confirm-dialog__icon--danger' : undefined"
     >
-      <AppIcon :name="danger ? 'warning' : 'notebook'" />
+      <UiIcon :name="danger ? 'warning' : 'notebook'" />
     </span>
 
     <h2
@@ -92,25 +92,22 @@ onBeforeUnmount(() => {
     </p>
 
     <div class="confirm-dialog__actions">
-      <button
+      <UiButton
         ref="cancelButton"
-        class="button button--secondary confirm-dialog__action"
-        type="button"
+        variant="secondary"
         autofocus
         @click="emit('cancel')"
       >
         {{ cancelLabel }}
-      </button>
+      </UiButton>
 
-      <button
+      <UiButton
         ref="confirmButton"
-        class="button confirm-dialog__action"
-        :class="danger ? 'button--danger' : undefined"
-        type="button"
+        :variant="danger ? 'danger' : 'primary'"
         @click="emit('confirm')"
       >
         {{ confirmLabel }}
-      </button>
+      </UiButton>
     </div>
   </dialog>
 </template>
@@ -162,13 +159,6 @@ onBeforeUnmount(() => {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: $space-sm;
-  }
-
-  &__action {
-    min-width: 0;
-    padding-inline: $space-2xs;
-    font-size: $font-size-sm;
-    white-space: nowrap;
   }
 
   @media (max-width: $breakpoint-mobile) {

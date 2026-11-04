@@ -21,7 +21,7 @@ useHead({
 </script>
 
 <template>
-  <section class="page">
+  <section>
     <header class="page__header">
       <h1
         class="page__title"
@@ -30,15 +30,14 @@ useHead({
         Мои заметки
       </h1>
 
-      <NuxtLink
+      <UiButton
         v-if="notesStore.notes.length || notesStore.error"
-        class="button"
         to="/notes/new"
         aria-label="Создать заметку"
       >
-        <AppIcon name="plus" />
+        <UiIcon name="plus" />
         Создать
-      </NuxtLink>
+      </UiButton>
     </header>
 
     <StorageErrorNotice
@@ -64,7 +63,7 @@ useHead({
       class="page__empty"
     >
       <span class="page__empty-icon">
-        <AppIcon name="notebook" />
+        <UiIcon name="notebook" />
       </span>
 
       <h2 class="page__empty-title">Заметок пока нет</h2>
@@ -73,14 +72,13 @@ useHead({
         Сохраните идею, составьте список покупок или спланируйте день.
       </p>
 
-      <NuxtLink
-        class="button"
+      <UiButton
         to="/notes/new"
         aria-label="Создать заметку"
       >
-        <AppIcon name="plus" />
+        <UiIcon name="plus" />
         Создать
-      </NuxtLink>
+      </UiButton>
     </div>
 
     <ConfirmDialog

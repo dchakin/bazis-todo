@@ -27,12 +27,11 @@ const draft = reactive<NoteContent>({
 
 const submitted = ref(false)
 const form = useTemplateRef('form')
-const titleId = useId()
 const history = useNoteHistory(draft)
 const { canUndo, canRedo } = history
 
-const titleInvalid = computed(() => {
-  return submitted.value && !draft.title.trim()
+const titleError = computed(() => {
+  return submitted.value && !draft.title.trim() ? 'Введите название заметки.' : undefined
 })
 
 const completedCount = computed(() => {
@@ -99,10 +98,6 @@ async function saveNote() {
       }
     }),
   })
-}
-
-function updateTitle(event: Event) {
-  history.updateTitle((event.target as HTMLInputElement).value)
 }
 
 function cancelEditing() {
@@ -182,62 +177,48 @@ onBeforeUnmount(() => {
       role="group"
       aria-label="История изменений"
     >
-      <button
-        class="button button--secondary note-editor__history-action"
-        type="button"
+      <UiButton
+        class="note-editor__history-action"
+        variant="secondary"
         :disabled="!canUndo"
         aria-label="Отменить изменение"
         aria-keyshortcuts="Control+Z"
         title="Отменить изменение (Ctrl+Z вне текстового поля)"
         @click="history.undo"
       >
-        <AppIcon name="undo" />
+        <UiIcon name="undo" />
         Отменить
-      </button>
+      </UiButton>
 
-      <button
-        class="button button--secondary note-editor__history-action"
-        type="button"
+      <UiButton
+        class="note-editor__history-action"
+        variant="secondary"
         :disabled="!canRedo"
         aria-label="Повторить изменение"
         aria-keyshortcuts="Control+Shift+Z"
         title="Повторить изменение (Ctrl+Shift+Z вне текстового поля)"
         @click="history.redo"
       >
-        <AppIcon name="redo" />
+        <UiIcon name="redo" />
         Повторить
-      </button>
+      </UiButton>
     </div>
 
-    <div class="field">
-      <label
-        class="field__label"
-        :for="titleId"
-      >
-        Название заметки
-      </label>
-
-      <input
-        :id="titleId"
-        :value="draft.title"
-        class="field__input note-editor__title-input"
-        type="text"
+    <UiField
+      v-slot="{ inputAttrs }"
+      label="Название заметки"
+      :error="titleError"
+    >
+      <UiInput
+        v-bind="inputAttrs"
+        :model-value="draft.title"
+        class="note-editor__title-input"
         placeholder="Например, планы на неделю"
         required
-        :aria-invalid="titleInvalid || undefined"
-        :aria-describedby="titleInvalid ? `${titleId}-error` : undefined"
-        @input="updateTitle"
+        @update:model-value="history.updateTitle"
         @blur="history.finishTextEdit"
       />
-
-      <p
-        v-if="titleInvalid"
-        :id="`${titleId}-error`"
-        class="field__error"
-      >
-        Введите название заметки.
-      </p>
-    </div>
+    </UiField>
 
     <section aria-labelledby="todos-title">
       <div class="note-editor__header">
@@ -279,52 +260,45 @@ onBeforeUnmount(() => {
         v-else
         class="note-editor__empty"
       >
-        <AppIcon name="list" />
+        <UiIcon name="list" />
 
         <p class="note-editor__empty-text">Добавьте дела, которые хотите держать под рукой.</p>
       </div>
 
-      <button
-        class="button note-editor__add"
-        type="button"
+      <UiButton
+        class="note-editor__add"
+        variant="dashed"
         data-add-todo
         aria-label="Добавить задачу"
         @click="addTodo"
       >
-        <AppIcon name="plus" />
+        <UiIcon name="plus" />
         Добавить
-      </button>
+      </UiButton>
     </section>
 
     <div class="note-editor__actions">
       <div class="note-editor__primary-actions">
-        <button
-          class="button note-editor__action"
-          type="submit"
-        >
-          Сохранить
-        </button>
+        <UiButton type="submit"> Сохранить </UiButton>
 
-        <button
-          class="button button--quiet note-editor__action"
-          type="button"
+        <UiButton
+          variant="quiet"
           aria-label="Отменить редактирование"
           @click="cancelEditing"
         >
           Отменить
-        </button>
+        </UiButton>
       </div>
 
-      <button
+      <UiButton
         v-if="canDelete"
-        class="button button--danger-quiet note-editor__delete"
-        type="button"
+        variant="danger-quiet"
         aria-label="Удалить заметку"
         @click="deleteNote"
       >
-        <AppIcon name="trash" />
+        <UiIcon name="trash" />
         Удалить
-      </button>
+      </UiButton>
     </div>
   </form>
 </template>
@@ -349,11 +323,6 @@ onBeforeUnmount(() => {
 
   &__history-action {
     flex: 1;
-    gap: $space-2xs;
-    min-width: 0;
-    padding-inline: $space-2xs;
-    font-size: $font-size-sm;
-    white-space: nowrap;
   }
 
   &__title-input {
@@ -391,15 +360,6 @@ onBeforeUnmount(() => {
     justify-content: flex-start;
     width: 100%;
     margin-top: $space-sm;
-    padding: $space-sm $space-md;
-    border: $border-width dashed $color-input-border;
-    color: $accent;
-    background-color: $color-surface;
-
-    &:hover {
-      border-color: $accent;
-      background-color: $color-accent-background;
-    }
   }
 
   &__empty {
@@ -434,14 +394,6 @@ onBeforeUnmount(() => {
     gap: $space-sm;
   }
 
-  &__action {
-    min-width: 0;
-  }
-
-  &__delete {
-    font-size: $font-size-sm;
-  }
-
   @media (max-width: $breakpoint-mobile) {
     gap: $space-xl;
     padding: $space-md;
@@ -452,15 +404,6 @@ onBeforeUnmount(() => {
       align-items: stretch;
       flex-basis: 100%;
       gap: $space-xs;
-    }
-
-    &__action {
-      padding-inline: $space-xs;
-      font-size: $font-size-sm;
-    }
-
-    &__delete {
-      padding-inline: 0;
     }
   }
 }

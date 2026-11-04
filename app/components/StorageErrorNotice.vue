@@ -16,15 +16,15 @@ const emit = defineEmits<{
   >
     <p class="error-notice__message">{{ message }}</p>
 
-    <button
+    <UiButton
       v-if="canRetry"
-      class="button button--secondary error-notice__retry"
+      class="error-notice__retry"
+      variant="secondary"
       aria-label="Повторить загрузку"
-      type="button"
       @click="emit('retry')"
     >
       Повторить
-    </button>
+    </UiButton>
   </div>
 </template>
 

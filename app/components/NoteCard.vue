@@ -16,10 +16,17 @@ const previewTodos = computed(() => {
 const remainingCount = computed(() => {
   return Math.max(0, note.todos.length - 3)
 })
+
 const completedCount = computed(() => {
   return note.todos.filter((todo) => {
     return todo.completed
   }).length
+})
+
+const summary = computed(() => {
+  return note.todos.length
+    ? `Выполнено: ${completedCount.value} из ${note.todos.length}`
+    : 'Без задач'
 })
 
 const editorPath = computed(() => {
@@ -41,15 +48,14 @@ const editorPath = computed(() => {
         </NuxtLink>
       </h2>
 
-      <button
-        class="button button--icon button--danger-quiet"
-        type="button"
+      <UiButton
+        variant="danger-quiet"
         title="Удалить заметку"
         :aria-label="`Удалить заметку «${note.title}»`"
         @click="emit('delete', note)"
       >
-        <AppIcon name="trash" />
-      </button>
+        <UiIcon name="trash" />
+      </UiButton>
     </div>
 
     <ul
@@ -62,16 +68,12 @@ const editorPath = computed(() => {
         :key="todo.id"
         class="note-card__todo"
       >
-        <span
+        <UiCheckbox
+          :model-value="todo.completed"
           class="note-card__check"
-          :class="todo.completed ? 'note-card__check--completed' : undefined"
+          disabled
           aria-hidden="true"
-        >
-          <AppIcon
-            v-if="todo.completed"
-            name="check"
-          />
-        </span>
+        />
 
         <span class="visually-hidden">{{ todo.completed ? 'Выполнено:' : 'Не выполнено:' }}</span>
 
@@ -101,9 +103,7 @@ const editorPath = computed(() => {
 
     <div class="note-card__footer">
       <span class="note-card__summary">
-        {{
-          note.todos.length ? `Выполнено: ${completedCount} из ${note.todos.length}` : 'Без задач'
-        }}
+        {{ summary }}
       </span>
 
       <NuxtLink
@@ -112,14 +112,13 @@ const editorPath = computed(() => {
         :aria-label="`Редактировать заметку «${note.title}»`"
       >
         Открыть
-        <AppIcon name="arrow-right" />
+        <UiIcon name="arrow-right" />
       </NuxtLink>
     </div>
 
     <div class="note-card__progress-track">
-      <progress
+      <UiProgress
         v-if="note.todos.length"
-        class="note-card__progress"
         :value="completedCount"
         :max="note.todos.length"
         :aria-label="`Выполнение задач заметки «${note.title}»`"
@@ -134,7 +133,6 @@ const editorPath = computed(() => {
 .note-card {
   display: flex;
   flex-direction: column;
-  min-width: 0;
   padding: $space-xl;
   border: $border-width solid $color-border;
   border-radius: $radius-lg;
@@ -150,7 +148,7 @@ const editorPath = computed(() => {
   }
 
   &__title {
-    min-width: 0;
+    align-self: center;
     margin: 0;
     font-size: $font-size-lg;
     line-height: $line-height-title;
@@ -177,24 +175,13 @@ const editorPath = computed(() => {
 
   &__todo {
     display: grid;
-    grid-template-columns: $todo-checkbox-size minmax(0, 1fr);
+    grid-template-columns: $checkbox-size minmax(0, 1fr);
     align-items: center;
     gap: $space-sm;
   }
 
   &__check {
-    display: grid;
-    place-items: center;
-    width: $todo-checkbox-size;
-    height: $todo-checkbox-size;
-    border: $border-width solid $color-input-border;
-    border-radius: $space-2xs;
-
-    &--completed {
-      border-color: $accent;
-      color: $color-surface;
-      background-color: $accent;
-    }
+    --ui-checkbox-min-size: #{$checkbox-size};
   }
 
   &__remaining {
@@ -253,32 +240,6 @@ const editorPath = computed(() => {
   &__progress-track {
     height: $space-2xs;
     margin-top: $space-xs;
-  }
-
-  &__progress {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    border-radius: $radius-sm;
-    color: $accent;
-    background-color: $color-secondary-hover;
-    overflow: hidden;
-    appearance: none;
-
-    &::-webkit-progress-bar {
-      background-color: $color-secondary-hover;
-    }
-
-    &::-webkit-progress-value {
-      border-radius: $radius-sm;
-      background-color: $accent;
-    }
-
-    &::-moz-progress-bar {
-      border-radius: $radius-sm;
-      background-color: $accent;
-    }
   }
 }
 </style>

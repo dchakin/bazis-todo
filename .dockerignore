@@ -1,0 +1,16 @@
+.git
+.nuxt
+.output
+.data
+.cache
+node_modules
+dist
+coverage
+.env
+.env.*
+*.md
+*.log
+.idea
+.vscode
+.DS_Store
+Thumbs.db

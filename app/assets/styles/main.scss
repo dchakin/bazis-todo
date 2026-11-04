@@ -19,6 +19,12 @@ body {
   margin: 0;
 }
 
+button,
+input,
+textarea {
+  font: inherit;
+}
+
 a {
   color: $accent;
   text-underline-offset: 0.2em;
@@ -67,18 +73,127 @@ h1 {
   justify-content: center;
   min-height: 2.75rem;
   padding: 0.65rem 1rem;
+  border: 1px solid transparent;
   border-radius: 0.5rem;
   color: #fff;
   background: $accent;
   text-align: center;
   text-decoration: none;
+  cursor: pointer;
+  overflow-wrap: anywhere;
 
   &:hover {
     background: #254398;
+  }
+
+  &-secondary {
+    border-color: #dce0ea;
+    color: #26334f;
+    background: #f5f6fa;
+
+    &:hover {
+      background: #e9edf7;
+    }
+  }
+
+  &-danger {
+    background: #b12a3b;
+
+    &:hover {
+      background: #922032;
+    }
+  }
+
+  &-danger-secondary {
+    border-color: #e9cbd0;
+    color: #a42234;
+    background: #fff;
+
+    &:hover {
+      background: #fff0f2;
+    }
   }
 }
 
 .back-link {
   display: inline-block;
   margin-bottom: 1.5rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.muted {
+  color: #5d6576;
+  overflow-wrap: anywhere;
+}
+
+.completed {
+  color: #5d6576;
+  text-decoration: line-through;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+
+.text-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #a6afc0;
+  border-radius: 0.5rem;
+  color: inherit;
+  background: #fff;
+
+  &[aria-invalid='true'] {
+    border-color: #b12a3b;
+  }
+}
+
+.field-error {
+  margin: 0.5rem 0 0;
+  color: #a42234;
+}
+
+.error-notice {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #e9cbd0;
+  border-radius: 0.5rem;
+  color: #a42234;
+  background: #fff0f2;
+  overflow-wrap: anywhere;
+
+  p {
+    margin: 0;
+  }
+
+  .button {
+    margin-top: 0.75rem;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 540px) {
+  .app-shell {
+    margin: 1rem auto;
+  }
 }

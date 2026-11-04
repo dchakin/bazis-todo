@@ -1,5 +1,6 @@
 # Local documents and implementation plans
 *.md
+!/README.md
 
 # Dependencies
 node_modules/

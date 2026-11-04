@@ -185,12 +185,16 @@ onBeforeUnmount(() => {
 
   &__actions {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(max-content, 1fr));
     gap: $space-sm;
   }
 
   @media (max-width: $breakpoint-mobile) {
     padding: $space-xl;
+
+    &__actions {
+      gap: $space-xs;
+    }
   }
 }
 </style>

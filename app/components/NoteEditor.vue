@@ -409,6 +409,10 @@ onBeforeUnmount(() => {
     gap: $space-xl;
     padding: $space-md;
 
+    &__history-action {
+      --ui-button-padding: #{$space-xs} #{$space-2xs};
+    }
+
     &__primary-actions {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));

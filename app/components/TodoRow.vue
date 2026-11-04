@@ -17,6 +17,47 @@ const emit = defineEmits<{
   remove: []
 }>()
 
+const textInput = useTemplateRef('textInput')
+
+let resizeObserver: ResizeObserver | undefined
+let previousWidth = 0
+
+function resizeText() {
+  const input = textInput.value
+
+  if (!input) {
+    return
+  }
+
+  input.style.height = 'auto'
+  input.style.height = `${input.scrollHeight + input.offsetHeight - input.clientHeight}px`
+}
+
+watch(text, resizeText, {
+  flush: 'post',
+})
+
+onMounted(() => {
+  resizeText()
+
+  resizeObserver = new ResizeObserver((entries) => {
+    const width = entries[0]?.contentRect.width
+
+    if (width !== undefined && width !== previousWidth) {
+      previousWidth = width
+      resizeText()
+    }
+  })
+
+  if (textInput.value) {
+    resizeObserver.observe(textInput.value)
+  }
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+})
+
 const inputId = computed(() => {
   return `todo-${todoId}`
 })
@@ -24,30 +65,44 @@ const inputId = computed(() => {
 
 <template>
   <li class="field todo-row">
+    <label class="todo-row__toggle">
+      <input
+        v-model="completed"
+        class="todo-row__checkbox"
+        type="checkbox"
+        :aria-label="`Задача ${index + 1} выполнена`"
+      />
+    </label>
+
     <label
-      class="field__label todo-row__label"
+      class="visually-hidden"
       :for="inputId"
     >
       Задача {{ index + 1 }}
     </label>
 
-    <input
-      v-model="completed"
-      class="todo-row__checkbox"
-      type="checkbox"
-      :aria-label="`Задача ${index + 1} выполнена`"
-    />
-
     <textarea
       :id="inputId"
+      ref="textInput"
       v-model="text"
-      class="field__input todo-row__text"
+      class="field__input field__input--plain todo-row__text"
       :class="completed ? 'todo-row__text--completed' : undefined"
-      rows="2"
+      rows="1"
+      placeholder="Что нужно сделать?"
       required
       :aria-invalid="invalid || undefined"
       :aria-describedby="invalid ? `${inputId}-error` : undefined"
     />
+
+    <button
+      class="button button--icon button--danger-quiet todo-row__remove"
+      type="button"
+      :aria-label="`Удалить задачу ${index + 1}`"
+      :title="`Удалить задачу ${index + 1}`"
+      @click="emit('remove')"
+    >
+      <AppIcon name="trash" />
+    </button>
 
     <p
       v-if="invalid"
@@ -56,15 +111,6 @@ const inputId = computed(() => {
     >
       Введите текст задачи или удалите её.
     </p>
-
-    <button
-      class="button button--danger-secondary todo-row__remove"
-      type="button"
-      :aria-label="`Удалить задачу ${index + 1}`"
-      @click="emit('remove')"
-    >
-      Удалить
-    </button>
   </li>
 </template>
 
@@ -75,19 +121,24 @@ const inputId = computed(() => {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: start;
-  column-gap: $space-sm;
-  row-gap: $space-xs;
+  gap: $space-2xs;
+  padding: $space-xs;
+  border: $border-width solid $color-border;
+  border-radius: $radius-md;
+  background-color: $color-surface;
 
-  &__label {
-    grid-column: 2;
+  &__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 1;
     grid-row: 1;
-    margin: 0;
+    min-width: $control-min-height;
+    min-height: $control-min-height;
+    cursor: pointer;
   }
 
   &__checkbox {
-    grid-column: 1;
-    grid-row: 2;
-    align-self: center;
     width: $todo-checkbox-size;
     height: $todo-checkbox-size;
     margin: 0;
@@ -97,8 +148,9 @@ const inputId = computed(() => {
 
   &__text {
     grid-column: 2;
-    grid-row: 2;
-    resize: vertical;
+    grid-row: 1;
+    overflow: hidden;
+    resize: none;
 
     &--completed {
       color: $color-text-muted;
@@ -108,23 +160,20 @@ const inputId = computed(() => {
 
   &__remove {
     grid-column: 3;
-    grid-row: 2;
+    grid-row: 1;
   }
 
   &__error {
-    grid-column: 2;
+    grid-column: 2 / -1;
     margin: 0;
+    padding-inline: $space-xs;
   }
-}
 
-@media (max-width: $breakpoint-mobile) {
-  .todo-row {
-    grid-template-columns: auto minmax(0, 1fr);
+  @media (max-width: $breakpoint-mobile) {
+    padding: $space-2xs;
 
-    &__remove {
-      grid-column: 2;
-      grid-row: auto;
-      justify-self: start;
+    &__text {
+      padding-inline: $space-xs;
     }
   }
 }

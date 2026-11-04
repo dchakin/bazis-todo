@@ -31,28 +31,21 @@ useHead({
       </h1>
 
       <NuxtLink
+        v-if="notesStore.notes.length || notesStore.error"
         class="button"
         to="/notes/new"
+        aria-label="Создать заметку"
       >
-        Создать заметку
+        <AppIcon name="plus" />
+        Создать
       </NuxtLink>
     </header>
 
-    <div
+    <StorageErrorNotice
       v-if="notesStore.error"
-      class="error-notice"
-      role="alert"
-    >
-      <p class="error-notice__message">{{ notesStore.error.message }}</p>
-
-      <button
-        class="button button--secondary error-notice__retry"
-        type="button"
-        @click="notesStore.loadNotes()"
-      >
-        Повторить загрузку
-      </button>
-    </div>
+      :message="notesStore.error.message"
+      @retry="notesStore.loadNotes()"
+    />
 
     <div
       v-if="notesStore.notes.length"
@@ -70,15 +63,23 @@ useHead({
       v-else-if="!notesStore.error"
       class="page__empty"
     >
+      <span class="page__empty-icon">
+        <AppIcon name="notebook" />
+      </span>
+
       <h2 class="page__empty-title">Заметок пока нет</h2>
 
-      <p class="page__description">Создайте первую заметку и добавьте задачи.</p>
+      <p class="page__empty-description">
+        Сохраните идею, составьте список покупок или спланируйте день.
+      </p>
 
       <NuxtLink
-        class="button button--secondary"
+        class="button"
         to="/notes/new"
+        aria-label="Создать заметку"
       >
-        Создать первую заметку
+        <AppIcon name="plus" />
+        Создать
       </NuxtLink>
     </div>
 
@@ -87,7 +88,7 @@ useHead({
       title="Удалить заметку?"
       :message="`Заметка «${pendingDelete.title}» будет удалена вместе со всеми задачами.`"
       confirm-label="Удалить"
-      cancel-label="Оставить заметку"
+      cancel-label="Отменить"
       @confirm="deleteNote"
       @cancel="pendingDelete = null"
     />
@@ -100,19 +101,40 @@ useHead({
 .page {
   &__notes {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, $card-min-width), 1fr));
-    gap: $space-md;
-    margin-top: $space-2xl;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, $card-min-width), 1fr));
+    gap: $space-xl;
   }
 
   &__empty {
-    padding: $space-3xl 0 $space-md;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: $space-3xl $space-xl;
+    border: $border-width dashed $color-input-border;
+    border-radius: $radius-lg;
+    background-color: $color-surface;
     text-align: center;
+  }
+
+  &__empty-icon {
+    display: grid;
+    place-items: center;
+    padding: $space-xl;
+    margin-bottom: $space-xl;
+    border-radius: $radius-lg;
+    color: $accent;
+    background-color: $color-accent-background;
   }
 
   &__empty-title {
     margin: 0;
-    font-size: $font-size-lg;
+    font-size: $font-size-xl;
+  }
+
+  &__empty-description {
+    max-width: $dialog-max-width;
+    margin: $space-sm 0 $space-xl;
+    color: $color-text-muted;
   }
 }
 </style>

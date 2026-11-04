@@ -19,21 +19,13 @@ body {
   margin: 0;
 }
 
-.link {
-  color: $accent;
-  text-underline-offset: $text-underline-offset;
-}
-
 :focus-visible {
   outline: $focus-ring-width solid $accent;
   outline-offset: $focus-outline-offset;
 }
 
 .page {
-  padding: $space-2xl;
-  border: $border-width solid $color-border;
-  border-radius: $radius-lg;
-  background-color: $color-surface;
+  min-width: 0;
 
   &__title {
     margin: 0;
@@ -47,31 +39,55 @@ body {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: $space-md;
-  }
-
-  &__description {
-    color: $color-text-muted;
-    overflow-wrap: anywhere;
-  }
-
-  &__back-link {
-    display: inline-block;
-    margin-bottom: $space-xl;
+    gap: $space-xl;
+    margin-bottom: $space-2xl;
   }
 
   @media (max-width: $breakpoint-mobile) {
-    padding: $space-md;
-
     &__title {
       font-size: $font-size-xl;
+    }
+
+    &__header {
+      gap: $space-md;
+      margin-bottom: $space-xl;
     }
   }
 }
 
 .app-shell {
   width: min(100% - $space-2xl, $layout-max-width);
-  margin: $space-3xl auto;
+  margin: 0 auto $space-3xl;
+
+  &__header {
+    margin-bottom: $space-3xl;
+    padding-block: $space-xl;
+    border-bottom: $border-width solid $color-border;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__mark {
+    display: grid;
+    place-items: center;
+    width: $control-min-height;
+    height: $control-min-height;
+    border-radius: $radius-md;
+    color: $color-surface;
+    background-color: $accent;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    &__header {
+      margin-bottom: $space-xl;
+      padding-block: $space-md;
+    }
+  }
 }
 
 .button {
@@ -79,6 +95,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: $space-xs;
   min-height: $control-min-height;
   padding: $space-xs $space-md;
   border: $border-width solid transparent;
@@ -88,6 +105,7 @@ body {
   text-align: center;
   text-decoration: none;
   cursor: pointer;
+  font-weight: $font-weight-semibold;
   overflow-wrap: anywhere;
 
   &:hover {
@@ -97,7 +115,7 @@ body {
   &--secondary {
     border-color: $color-border;
     color: $color-text-secondary;
-    background-color: $color-background;
+    background-color: $color-surface;
 
     &:hover {
       background-color: $color-secondary-hover;
@@ -112,22 +130,30 @@ body {
     }
   }
 
-  &--danger-secondary {
-    border-color: $color-danger-border;
-    color: $color-danger-text;
-    background-color: $color-surface;
+  &--quiet {
+    color: $color-text-secondary;
+    background-color: transparent;
 
     &:hover {
+      color: $accent;
+      background-color: $color-accent-background;
+    }
+  }
+
+  &--danger-quiet {
+    color: $color-text-muted;
+    background-color: transparent;
+
+    &:hover {
+      color: $color-danger-text;
       background-color: $color-danger-background;
     }
   }
-}
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: $space-sm;
+  &--icon {
+    width: $control-min-height;
+    padding: $space-xs;
+  }
 }
 
 .field {
@@ -136,6 +162,7 @@ body {
   &__label {
     display: block;
     margin-bottom: $space-xs;
+    font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
   }
 
@@ -151,9 +178,15 @@ body {
     color: inherit;
     background-color: $color-surface;
 
+    &--plain {
+      border-color: transparent;
+      background-color: transparent;
+    }
+
     &:focus {
       outline: none;
       border-color: $accent;
+      background-color: $color-surface;
       box-shadow: 0 0 0 $focus-ring-width $color-focus-ring;
     }
 
@@ -169,24 +202,7 @@ body {
   &__error {
     margin: $space-xs 0 0;
     color: $color-danger-text;
-  }
-}
-
-.error-notice {
-  margin-top: $space-xl;
-  padding: $space-md;
-  border: $border-width solid $color-danger-border;
-  border-radius: $radius-sm;
-  color: $color-danger-text;
-  background-color: $color-danger-background;
-  overflow-wrap: anywhere;
-
-  &__message {
-    margin: 0;
-  }
-
-  &__retry {
-    margin-top: $space-sm;
+    font-size: $font-size-sm;
   }
 }
 
@@ -198,10 +214,4 @@ body {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-}
-
-@media (max-width: $breakpoint-mobile) {
-  .app-shell {
-    margin: $space-md auto;
-  }
 }

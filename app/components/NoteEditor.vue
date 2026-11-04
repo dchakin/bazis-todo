@@ -32,6 +32,12 @@ const titleInvalid = computed(() => {
   return submitted.value && !draft.title.trim()
 })
 
+const completedCount = computed(() => {
+  return draft.todos.filter((todo) => {
+    return todo.completed
+  }).length
+})
+
 async function addTodo() {
   const todo = createTodo()
 
@@ -105,8 +111,9 @@ async function saveNote() {
       <input
         :id="titleId"
         v-model="draft.title"
-        class="field__input"
+        class="field__input note-editor__title-input"
         type="text"
+        placeholder="Например, планы на неделю"
         required
         :aria-invalid="titleInvalid || undefined"
         :aria-describedby="titleInvalid ? `${titleId}-error` : undefined"
@@ -122,7 +129,7 @@ async function saveNote() {
     </div>
 
     <section aria-labelledby="todos-title">
-      <div class="actions note-editor__header">
+      <div class="note-editor__header">
         <h2
           id="todos-title"
           class="note-editor__section-title"
@@ -130,14 +137,12 @@ async function saveNote() {
           Задачи
         </h2>
 
-        <button
-          class="button button--secondary"
-          type="button"
-          data-add-todo
-          @click="addTodo"
+        <span
+          v-if="draft.todos.length"
+          class="note-editor__count"
         >
-          Добавить задачу
-        </button>
+          Выполнено: {{ completedCount }} из {{ draft.todos.length }}
+        </span>
       </div>
 
       <ul
@@ -156,37 +161,55 @@ async function saveNote() {
         />
       </ul>
 
-      <p
+      <div
         v-else
         class="note-editor__empty"
       >
-        Задач пока нет. Можно добавить их или сохранить только название.
-      </p>
+        <AppIcon name="list" />
+
+        <p class="note-editor__empty-text">Добавьте дела, которые хотите держать под рукой.</p>
+      </div>
+
+      <button
+        class="button note-editor__add"
+        type="button"
+        data-add-todo
+        aria-label="Добавить задачу"
+        @click="addTodo"
+      >
+        <AppIcon name="plus" />
+        Добавить
+      </button>
     </section>
 
-    <div class="actions note-editor__actions">
-      <button
-        class="button"
-        type="submit"
-      >
-        Сохранить
-      </button>
+    <div class="note-editor__actions">
+      <div class="note-editor__primary-actions">
+        <button
+          class="button note-editor__action"
+          type="submit"
+        >
+          Сохранить
+        </button>
 
-      <button
-        class="button button--secondary"
-        type="button"
-        @click="emit('cancel')"
-      >
-        Отменить редактирование
-      </button>
+        <button
+          class="button button--quiet note-editor__action"
+          type="button"
+          aria-label="Отменить редактирование"
+          @click="emit('cancel')"
+        >
+          Отменить
+        </button>
+      </div>
 
       <button
         v-if="canDelete"
-        class="button button--danger-secondary"
+        class="button button--danger-quiet note-editor__delete"
         type="button"
+        aria-label="Удалить заметку"
         @click="emit('delete')"
       >
-        Удалить заметку
+        <AppIcon name="trash" />
+        Удалить
       </button>
     </div>
   </form>
@@ -198,33 +221,118 @@ async function saveNote() {
 .note-editor {
   display: grid;
   gap: $space-2xl;
-  margin-top: $space-2xl;
+  padding: $space-2xl;
+  border: $border-width solid $color-border;
+  border-radius: $radius-lg;
+  background-color: $color-surface;
+  box-shadow: $shadow-surface;
+
+  &__title-input {
+    font-size: $font-size-lg;
+  }
 
   &__section-title {
     margin: 0;
     font-size: $font-size-lg;
   }
 
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-xs;
+    margin-bottom: $space-md;
+  }
+
+  &__count {
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+  }
+
   &__todos {
     display: grid;
-    gap: $space-lg;
-    margin: $space-lg 0 0;
+    gap: $space-xs;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
 
+  &__add {
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: $space-sm;
+    padding: $space-sm $space-md;
+    border: $border-width dashed $color-input-border;
+    color: $accent;
+    background-color: $color-surface;
+
+    &:hover {
+      border-color: $accent;
+      background-color: $color-accent-background;
+    }
+  }
+
+  &__empty {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    padding: $space-md;
+    border-radius: $radius-sm;
+    color: $color-text-muted;
+    background-color: $color-background;
+  }
+
+  &__empty-text {
+    margin: 0;
+    font-size: $font-size-sm;
+  }
+
   &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-sm;
     padding-top: $space-xl;
     border-top: $border-width solid $color-border;
   }
 
-  &__header {
-    justify-content: space-between;
+  &__primary-actions {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-sm;
   }
 
-  &__empty {
-    color: $color-text-muted;
-    overflow-wrap: anywhere;
+  &__action {
+    min-width: 0;
+  }
+
+  &__delete {
+    font-size: $font-size-sm;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    gap: $space-xl;
+    padding: $space-md;
+
+    &__primary-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+      flex-basis: 100%;
+      gap: $space-xs;
+    }
+
+    &__action {
+      padding-inline: $space-xs;
+      font-size: $font-size-sm;
+    }
+
+    &__delete {
+      padding-inline: 0;
+    }
   }
 }
 </style>

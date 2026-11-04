@@ -107,54 +107,59 @@ useHead({
 </script>
 
 <template>
-  <section class="page">
+  <section class="page note-page">
     <a
-      class="link page__back-link"
+      class="note-page__back-link"
       href="/"
       @click.prevent="returnToList"
     >
+      <AppIcon name="arrow-left" />
       К списку заметок
     </a>
 
-    <header class="page__header">
+    <header class="note-page__header">
       <h1
         class="page__title"
         tabindex="-1"
       >
         {{ pageTitle }}
       </h1>
+
+      <p class="note-page__description">
+        {{
+          isNew
+            ? 'Дайте заметке название и добавьте задачи, если нужно.'
+            : 'Изменения сохранятся после нажатия «Сохранить».'
+        }}
+      </p>
     </header>
 
-    <div
+    <StorageErrorNotice
       v-if="storageError"
-      class="error-notice"
-      role="alert"
-    >
-      <p class="error-notice__message">{{ storageError.message }}</p>
-
-      <button
-        v-if="!initialNote"
-        class="button button--secondary error-notice__retry"
-        type="button"
-        @click="loadEditor"
-      >
-        Повторить загрузку
-      </button>
-    </div>
+      :message="storageError.message"
+      :can-retry="!initialNote"
+      @retry="loadEditor"
+    />
 
     <div
       v-if="missing"
+      class="note-page__notice"
       role="status"
     >
-      <h2>Заметка не найдена</h2>
+      <span class="note-page__notice-icon">
+        <AppIcon name="notebook" />
+      </span>
 
-      <p class="page__description">Возможно, она была удалена. Вернитесь к списку заметок.</p>
+      <h2 class="note-page__notice-title">Заметка не найдена</h2>
+
+      <p class="note-page__description">Возможно, она была удалена. Вернитесь к списку заметок.</p>
 
       <NuxtLink
-        class="button button--secondary"
+        class="button button--secondary note-page__notice-action"
         to="/"
+        aria-label="На главную"
       >
-        На главную
+        Вернуться
       </NuxtLink>
     </div>
 
@@ -169,10 +174,10 @@ useHead({
 
     <ConfirmDialog
       v-if="confirmation === 'cancel'"
-      title="Отменить редактирование?"
-      message="Несохранённые изменения будут потеряны."
-      confirm-label="Отменить редактирование"
-      cancel-label="Продолжить редактирование"
+      title="Выйти без сохранения?"
+      message="Изменения в этой заметке не сохранятся."
+      confirm-label="Выйти"
+      cancel-label="Продолжить"
       @confirm="confirmAction"
       @cancel="confirmation = null"
     />
@@ -182,9 +187,74 @@ useHead({
       title="Удалить заметку?"
       message="Заметка будет удалена вместе со всеми задачами."
       confirm-label="Удалить"
-      cancel-label="Оставить заметку"
+      cancel-label="Отменить"
       @confirm="confirmAction"
       @cancel="confirmation = null"
     />
   </section>
 </template>
+
+<style scoped lang="scss">
+@use '~/assets/styles/variables' as *;
+
+.note-page {
+  max-width: $editor-max-width;
+  margin-inline: auto;
+
+  &__header {
+    margin-bottom: $space-2xl;
+  }
+
+  &__back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-xs;
+    margin-bottom: $space-xl;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    text-decoration: none;
+
+    &:hover {
+      color: $accent;
+    }
+  }
+
+  &__description {
+    margin: $space-sm 0 0;
+    color: $color-text-muted;
+    overflow-wrap: anywhere;
+  }
+
+  &__notice {
+    padding: $space-2xl;
+    border: $border-width solid $color-border;
+    border-radius: $radius-lg;
+    background-color: $color-surface;
+    text-align: center;
+  }
+
+  &__notice-icon {
+    display: inline-flex;
+    padding: $space-md;
+    margin-bottom: $space-xl;
+    border-radius: $radius-md;
+    color: $accent;
+    background-color: $color-accent-background;
+  }
+
+  &__notice-title {
+    margin: 0;
+    font-size: $font-size-xl;
+  }
+
+  &__notice-action {
+    margin-top: $space-xl;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    &__header {
+      margin-bottom: $space-xl;
+    }
+  }
+}
+</style>

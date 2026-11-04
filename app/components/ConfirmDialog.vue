@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { cancelLabel = 'Оставить', danger = true } = defineProps<{
+const { cancelLabel = 'Отменить', danger = true } = defineProps<{
   title: string
   message: string
   confirmLabel: string
@@ -70,6 +70,13 @@ onBeforeUnmount(() => {
     @cancel.prevent="emit('cancel')"
     @keydown="trapFocus"
   >
+    <span
+      class="confirm-dialog__icon"
+      :class="danger ? 'confirm-dialog__icon--danger' : undefined"
+    >
+      <AppIcon :name="danger ? 'warning' : 'notebook'" />
+    </span>
+
     <h2
       :id="titleId"
       class="confirm-dialog__title"
@@ -84,10 +91,10 @@ onBeforeUnmount(() => {
       {{ message }}
     </p>
 
-    <div class="actions">
+    <div class="confirm-dialog__actions">
       <button
         ref="cancelButton"
-        class="button button--secondary"
+        class="button button--secondary confirm-dialog__action"
         type="button"
         autofocus
         @click="emit('cancel')"
@@ -97,7 +104,7 @@ onBeforeUnmount(() => {
 
       <button
         ref="confirmButton"
-        class="button"
+        class="button confirm-dialog__action"
         :class="danger ? 'button--danger' : undefined"
         type="button"
         @click="emit('confirm')"
@@ -114,14 +121,29 @@ onBeforeUnmount(() => {
 .confirm-dialog {
   width: min(100% - $space-2xl, $dialog-max-width);
   max-height: calc(100dvh - $space-2xl);
-  padding: $space-xl;
+  padding: $space-2xl;
   border: $border-width solid $color-border;
   border-radius: $radius-lg;
   color: inherit;
+  box-shadow: $shadow-dialog;
   overflow-wrap: anywhere;
 
   &::backdrop {
     background-color: $color-dialog-backdrop;
+  }
+
+  &__icon {
+    display: inline-flex;
+    padding: $space-md;
+    margin-bottom: $space-xl;
+    border-radius: $radius-md;
+    color: $accent;
+    background-color: $color-accent-background;
+
+    &--danger {
+      color: $color-danger-text;
+      background-color: $color-danger-background;
+    }
   }
 
   &__title {
@@ -132,7 +154,25 @@ onBeforeUnmount(() => {
 
   &__message {
     margin: $space-md 0 $space-xl;
+    color: $color-text-muted;
     white-space: pre-wrap;
+  }
+
+  &__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $space-sm;
+  }
+
+  &__action {
+    min-width: 0;
+    padding-inline: $space-2xs;
+    font-size: $font-size-sm;
+    white-space: nowrap;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: $space-xl;
   }
 }
 </style>

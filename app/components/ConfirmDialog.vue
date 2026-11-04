@@ -72,14 +72,14 @@ onBeforeUnmount(() => {
   >
     <h2
       :id="titleId"
-      class="dialog-title"
+      class="confirm-dialog__title"
     >
       {{ title }}
     </h2>
 
     <p
       :id="messageId"
-      class="dialog-message"
+      class="confirm-dialog__message"
     >
       {{ message }}
     </p>
@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
     <div class="actions">
       <button
         ref="cancelButton"
-        class="button button-secondary"
+        class="button button--secondary"
         type="button"
         autofocus
         @click="emit('cancel')"
@@ -98,7 +98,7 @@ onBeforeUnmount(() => {
       <button
         ref="confirmButton"
         class="button"
-        :class="danger ? 'button-danger' : undefined"
+        :class="danger ? 'button--danger' : undefined"
         type="button"
         @click="emit('confirm')"
       >
@@ -109,28 +109,30 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped lang="scss">
+@use '~/assets/styles/variables' as *;
+
 .confirm-dialog {
-  width: min(100% - 2rem, 28rem);
-  max-height: calc(100dvh - 2rem);
-  padding: 1.5rem;
-  border: 1px solid #dce0ea;
-  border-radius: 1rem;
+  width: min(100% - $space-2xl, $dialog-max-width);
+  max-height: calc(100dvh - $space-2xl);
+  padding: $space-xl;
+  border: $border-width solid $color-border;
+  border-radius: $radius-lg;
   color: inherit;
   overflow-wrap: anywhere;
 
   &::backdrop {
-    background: rgb(20 29 49 / 55%);
+    background-color: $color-dialog-backdrop;
   }
-}
 
-.dialog-title {
-  margin: 0;
-  font-size: 1.35rem;
-  line-height: 1.3;
-}
+  &__title {
+    margin: 0;
+    font-size: $font-size-xl;
+    line-height: $line-height-title;
+  }
 
-.dialog-message {
-  margin: 1rem 0 1.5rem;
-  white-space: pre-wrap;
+  &__message {
+    margin: $space-md 0 $space-xl;
+    white-space: pre-wrap;
+  }
 }
 </style>

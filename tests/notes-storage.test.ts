@@ -1,3 +1,4 @@
+import { NOTES_ERROR_CODES } from '../app/constants/notes-errors'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Note } from '../app/types/note'
 import { NOTES_STORAGE_KEY, readNotes, writeNotes } from '../app/utils/notes-storage'
@@ -176,7 +177,7 @@ describe('notes storage', () => {
     expect(readNotes()).toMatchObject({
       ok: false,
       error: {
-        code: 'invalid-data',
+        code: NOTES_ERROR_CODES.invalidData,
       },
     })
 
@@ -196,7 +197,7 @@ describe('notes storage', () => {
     expect(readNotes()).toMatchObject({
       ok: false,
       error: {
-        code: 'unsupported-version',
+        code: NOTES_ERROR_CODES.unsupportedVersion,
       },
     })
 
@@ -212,7 +213,7 @@ describe('notes storage', () => {
     expect(readNotes()).toMatchObject({
       ok: false,
       error: {
-        code: 'read-failed',
+        code: NOTES_ERROR_CODES.readFailed,
       },
     })
   })
@@ -223,14 +224,14 @@ describe('notes storage', () => {
     expect(readNotes()).toMatchObject({
       ok: false,
       error: {
-        code: 'read-failed',
+        code: NOTES_ERROR_CODES.readFailed,
       },
     })
 
     expect(writeNotes([note])).toMatchObject({
       ok: false,
       error: {
-        code: 'write-failed',
+        code: NOTES_ERROR_CODES.writeFailed,
       },
     })
   })
@@ -247,7 +248,7 @@ describe('notes storage', () => {
     expect(writeNotes([])).toMatchObject({
       ok: false,
       error: {
-        code: 'write-failed',
+        code: NOTES_ERROR_CODES.writeFailed,
       },
     })
 

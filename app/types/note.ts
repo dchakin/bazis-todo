@@ -1,3 +1,5 @@
+import type { NotesErrorCode } from '../constants/notes-errors'
+
 export interface Todo {
   id: string
   text: string
@@ -19,7 +21,7 @@ export interface NotesContainer {
 }
 
 export interface NotesError {
-  code: 'read-failed' | 'invalid-data' | 'unsupported-version' | 'write-failed' | 'not-found'
+  code: NotesErrorCode
   message: string
 }
 

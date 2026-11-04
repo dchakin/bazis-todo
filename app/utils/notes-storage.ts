@@ -1,3 +1,4 @@
+import { NOTES_ERROR_CODES } from '../constants/notes-errors'
 import type { Note, NotesContainer, NotesResult, Todo } from '../types/note'
 import { copyNote } from './notes'
 
@@ -65,7 +66,7 @@ export function readNotes(): NotesResult<Note[]> {
     return {
       ok: false,
       error: {
-        code: 'read-failed',
+        code: NOTES_ERROR_CODES.readFailed,
         message: 'Не удалось прочитать сохранённые заметки.',
       },
     }
@@ -86,7 +87,7 @@ export function readNotes(): NotesResult<Note[]> {
     return {
       ok: false,
       error: {
-        code: 'invalid-data',
+        code: NOTES_ERROR_CODES.invalidData,
         message: 'Сохранённые заметки повреждены.',
       },
     }
@@ -100,7 +101,7 @@ export function readNotes(): NotesResult<Note[]> {
     return {
       ok: false,
       error: {
-        code: 'unsupported-version',
+        code: NOTES_ERROR_CODES.unsupportedVersion,
         message: 'Версия сохранённых заметок не поддерживается.',
       },
     }
@@ -110,7 +111,7 @@ export function readNotes(): NotesResult<Note[]> {
     return {
       ok: false,
       error: {
-        code: 'invalid-data',
+        code: NOTES_ERROR_CODES.invalidData,
         message: 'Сохранённые заметки имеют неверный формат.',
       },
     }
@@ -134,7 +135,7 @@ export function writeNotes(notes: Note[]): NotesResult<void> {
     return {
       ok: false,
       error: {
-        code: 'write-failed',
+        code: NOTES_ERROR_CODES.writeFailed,
         message: 'Не удалось записать заметки в хранилище. Попробуйте ещё раз.',
       },
     }

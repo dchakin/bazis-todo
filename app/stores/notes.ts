@@ -1,3 +1,4 @@
+import { NOTES_ERROR_CODES } from '../constants/notes-errors'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Note, NoteContent, NotesError, NotesResult } from '../types/note'
@@ -79,7 +80,7 @@ export const useNotesStore = defineStore('notes', () => {
   function noteNotFound(latestNotes: Note[]): NotesResult<never> {
     notes.value = latestNotes
     error.value = {
-      code: 'not-found',
+      code: NOTES_ERROR_CODES.notFound,
       message: 'Заметка не найдена',
     }
 

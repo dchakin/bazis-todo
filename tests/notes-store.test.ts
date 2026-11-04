@@ -1,3 +1,4 @@
+import { NOTES_ERROR_CODES } from '../app/constants/notes-errors'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useNotesStore } from '../app/stores/notes'
@@ -220,11 +221,11 @@ describe('notes store', () => {
     expect(run(store)).toMatchObject({
       ok: false,
       error: {
-        code: 'write-failed',
+        code: NOTES_ERROR_CODES.writeFailed,
       },
     })
 
-    expect(store.error?.code).toBe('write-failed')
+    expect(store.error?.code).toBe(NOTES_ERROR_CODES.writeFailed)
     expect(store.notes).toEqual([first])
     expect(storage.getItem(NOTES_STORAGE_KEY)).toBe(previousRaw)
     expect(run(store).ok).toBe(true)
@@ -244,7 +245,7 @@ describe('notes store', () => {
     expect(run(store)).toMatchObject({
       ok: false,
       error: {
-        code: 'invalid-data',
+        code: NOTES_ERROR_CODES.invalidData,
       },
     })
 
@@ -264,7 +265,7 @@ describe('notes store', () => {
     })
 
     expect(store.loadNotes().ok).toBe(false)
-    expect(store.error?.code).toBe('read-failed')
+    expect(store.error?.code).toBe(NOTES_ERROR_CODES.readFailed)
     expect(store.notes).toEqual([first])
     expect(store.loadNotes().ok).toBe(true)
     expect(store.error).toBeNull()
@@ -296,7 +297,7 @@ describe('notes store', () => {
       expect(store.updateNote(draft)).toMatchObject({
         ok: false,
         error: {
-          code: 'not-found',
+          code: NOTES_ERROR_CODES.notFound,
         },
       })
 
@@ -345,7 +346,7 @@ describe('notes store', () => {
     expect(store.deleteNote(first.id)).toMatchObject({
       ok: false,
       error: {
-        code: 'not-found',
+        code: NOTES_ERROR_CODES.notFound,
       },
     })
 

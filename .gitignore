@@ -1,0 +1,25 @@
+# Local documents and implementation plans
+*.md
+
+# Dependencies
+node_modules/
+
+# Nuxt and build output
+.nuxt/
+.output/
+.data/
+.cache/
+dist/
+coverage/
+
+# Local environment and logs
+.env
+.env.*
+!.env.example
+*.log
+
+# Editor and operating system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

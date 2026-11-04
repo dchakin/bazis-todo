@@ -1,0 +1,84 @@
+$accent: #3154b8;
+
+:root {
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #202635;
+  background: #f5f6fa;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+}
+
+a {
+  color: $accent;
+  text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+  outline: 3px solid $accent;
+  outline-offset: 4px;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.app-shell {
+  width: min(100% - 2rem, 64rem);
+  margin: 3rem auto;
+}
+
+.page {
+  padding: clamp(1rem, 4vw, 2rem);
+  border: 1px solid #dce0ea;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-description {
+  margin: 1.5rem 0 0;
+  color: #5d6576;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.5rem;
+  color: #fff;
+  background: $accent;
+  text-align: center;
+  text-decoration: none;
+
+  &:hover {
+    background: #254398;
+  }
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}

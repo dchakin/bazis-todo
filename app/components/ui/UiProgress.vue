@@ -19,7 +19,7 @@ const { value, max = 100 } = defineProps<{
 .ui-progress {
   display: block;
   width: 100%;
-  height: var(--ui-progress-height, #{$space-2xs});
+  height: var(--ui-progress-height, #{$space-xs});
   border: 0;
   border-radius: var(--ui-progress-radius, #{$radius-sm});
   color: var(--ui-progress-color, #{$accent});

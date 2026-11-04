@@ -91,7 +91,7 @@ const editorPath = computed(() => {
       v-else
       class="note-card__empty"
     >
-      Здесь можно оставить идею или добавить задачи.
+      В заметке пока нет задач.
     </p>
 
     <p
@@ -133,9 +133,9 @@ const editorPath = computed(() => {
 .note-card {
   display: flex;
   flex-direction: column;
-  padding: $space-xl;
+  padding: $space-lg;
   border: $border-width solid $color-border;
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   background-color: $color-surface;
   box-shadow: $shadow-surface;
 
@@ -159,14 +159,15 @@ const editorPath = computed(() => {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: $space-xs;
+    gap: $space-sm;
     margin-bottom: $space-md;
   }
 
   &__title {
     align-self: center;
     margin: 0;
-    font-size: $font-size-lg;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
     line-height: $line-height-title;
   }
 
@@ -227,7 +228,7 @@ const editorPath = computed(() => {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: $space-xs;
+    gap: $space-sm;
     margin-top: auto;
     padding-top: $space-md;
     border-top: $border-width solid $color-border;
@@ -241,7 +242,7 @@ const editorPath = computed(() => {
   &__edit {
     display: inline-flex;
     align-items: center;
-    gap: $space-xs;
+    gap: $space-sm;
     min-height: $control-min-height;
     color: $accent;
     font-weight: $font-weight-semibold;
@@ -253,9 +254,13 @@ const editorPath = computed(() => {
     }
   }
 
+  @media (max-width: $breakpoint-mobile) {
+    padding: $space-md;
+  }
+
   &__progress-track {
-    height: $space-2xs;
-    margin-top: $space-xs;
+    height: $space-xs;
+    margin-top: $space-sm;
   }
 }
 </style>

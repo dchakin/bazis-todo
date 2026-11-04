@@ -7,6 +7,7 @@
   --motion-easing: #{$motion-easing};
 
   font-family: $font-family-base;
+  font-size: $font-size-base;
   line-height: $line-height-base;
   color: $color-text;
   background-color: $color-background;
@@ -32,7 +33,8 @@ body {
 .page {
   &__title {
     margin: 0;
-    font-size: $font-size-2xl;
+    font-size: $font-size-title;
+    font-weight: $font-weight-semibold;
     line-height: $line-height-title;
     overflow-wrap: anywhere;
   }
@@ -42,29 +44,25 @@ body {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: $space-xl;
-    margin-bottom: $space-2xl;
+    gap: $space-lg;
+    margin-bottom: $space-xl;
   }
 
   @media (max-width: $breakpoint-mobile) {
-    &__title {
-      font-size: $font-size-xl;
-    }
-
     &__header {
       gap: $space-md;
-      margin-bottom: $space-xl;
+      margin-bottom: $space-lg;
     }
   }
 }
 
 .app-shell {
-  width: min(100% - $space-2xl, $layout-max-width);
-  margin: 0 auto $space-3xl;
+  width: min(100% - $space-xl, $layout-max-width);
+  margin: 0 auto $space-xl;
 
   &__header {
-    margin-bottom: $space-3xl;
-    padding-block: $space-xl;
+    margin-bottom: $space-xl;
+    padding-block: $space-lg;
     border-bottom: $border-width solid $color-border;
   }
 
@@ -87,7 +85,7 @@ body {
 
   @media (max-width: $breakpoint-mobile) {
     &__header {
-      margin-bottom: $space-xl;
+      margin-bottom: $space-lg;
       padding-block: $space-md;
     }
   }

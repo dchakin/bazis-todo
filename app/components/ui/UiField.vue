@@ -51,7 +51,7 @@ const inputAttrs = computed(() => {
 
 .ui-field {
   display: grid;
-  gap: var(--ui-field-gap, #{$space-xs});
+  gap: var(--ui-field-gap, #{$space-sm});
   min-width: 0;
 
   &__label {

@@ -71,9 +71,7 @@ useHead({
 
       <h2 class="page__empty-title">Заметок пока нет</h2>
 
-      <p class="page__empty-description">
-        Сохраните идею, составьте список покупок или спланируйте день.
-      </p>
+      <p class="page__empty-description">Создайте первую заметку.</p>
 
       <UiButton
         to="/notes/new"
@@ -109,16 +107,16 @@ useHead({
   &__notes {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, $card-min-width), 1fr));
-    gap: $space-xl;
+    gap: $space-lg;
   }
 
   &__empty {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: $space-3xl $space-xl;
+    padding: $space-lg;
     border: $border-width dashed $color-input-border;
-    border-radius: $radius-lg;
+    border-radius: $radius-md;
     background-color: $color-surface;
     text-align: center;
   }
@@ -126,21 +124,28 @@ useHead({
   &__empty-icon {
     display: grid;
     place-items: center;
-    padding: $space-xl;
-    margin-bottom: $space-xl;
-    border-radius: $radius-lg;
+    padding: $space-lg;
+    margin-bottom: $space-lg;
+    border-radius: $radius-md;
     color: $accent;
     background-color: $color-accent-background;
   }
 
   &__empty-title {
     margin: 0;
-    font-size: $font-size-xl;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    &__empty {
+      padding: $space-md;
+    }
   }
 
   &__empty-description {
     max-width: $dialog-max-width;
-    margin: $space-sm 0 $space-xl;
+    margin: $space-sm 0 $space-lg;
     color: $color-text-muted;
   }
 }

@@ -393,14 +393,14 @@ useHead({
   margin-inline: auto;
 
   &__header {
-    margin-bottom: $space-2xl;
+    margin-bottom: $space-xl;
   }
 
   &__back-link {
     display: inline-flex;
     align-items: center;
-    gap: $space-xs;
-    margin-bottom: $space-xl;
+    gap: $space-sm;
+    margin-bottom: $space-lg;
     color: $color-text-muted;
     font-size: $font-size-sm;
     text-decoration: none;
@@ -417,9 +417,9 @@ useHead({
   }
 
   &__notice {
-    padding: $space-2xl;
+    padding: $space-lg;
     border: $border-width solid $color-border;
-    border-radius: $radius-lg;
+    border-radius: $radius-md;
     background-color: $color-surface;
     text-align: center;
   }
@@ -427,7 +427,7 @@ useHead({
   &__notice-icon {
     display: inline-flex;
     padding: $space-md;
-    margin-bottom: $space-xl;
+    margin-bottom: $space-lg;
     border-radius: $radius-md;
     color: $accent;
     background-color: $color-accent-background;
@@ -435,7 +435,8 @@ useHead({
 
   &__notice-title {
     margin: 0;
-    font-size: $font-size-xl;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
 
     &:focus {
       outline: none;
@@ -443,12 +444,16 @@ useHead({
   }
 
   &__notice-action {
-    margin-top: $space-xl;
+    margin-top: $space-lg;
   }
 
   @media (max-width: $breakpoint-mobile) {
     &__header {
-      margin-bottom: $space-xl;
+      margin-bottom: $space-lg;
+    }
+
+    &__notice {
+      padding: $space-md;
     }
   }
 }

@@ -95,10 +95,10 @@ defineExpose({
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  gap: var(--ui-button-gap, #{$space-2xs});
+  gap: var(--ui-button-gap, #{$space-xs});
   min-width: var(--ui-button-min-size, #{$control-min-height});
   min-height: var(--ui-button-min-size, #{$control-min-height});
-  padding: var(--ui-button-padding, #{$space-xs});
+  padding: var(--ui-button-padding, #{$space-sm});
   border: $border-width solid var(--ui-button-border-color, transparent);
   border-radius: var(--ui-button-radius, #{$radius-sm});
   color: var(--ui-button-text-color, #{$color-surface});

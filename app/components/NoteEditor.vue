@@ -223,8 +223,7 @@ onBeforeUnmount(() => {
       <UiInput
         v-bind="inputAttrs"
         :model-value="draft.title"
-        class="note-editor__title-input"
-        placeholder="Например, планы на неделю"
+        placeholder="Название заметки"
         required
         @update:model-value="history.updateTitle"
         @blur="history.finishTextEdit"
@@ -276,7 +275,7 @@ onBeforeUnmount(() => {
       >
         <UiIcon name="list" />
 
-        <p class="note-editor__empty-text">Добавьте дела, которые хотите держать под рукой.</p>
+        <p class="note-editor__empty-text">Добавьте первую задачу.</p>
       </div>
 
       <UiButton
@@ -322,17 +321,17 @@ onBeforeUnmount(() => {
 
 .note-editor {
   display: grid;
-  gap: $space-2xl;
-  padding: $space-2xl;
+  gap: $space-xl;
+  padding: $space-lg;
   border: $border-width solid $color-border;
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   background-color: $color-surface;
   box-shadow: $shadow-surface;
 
   &__history {
     display: flex;
     flex-wrap: wrap;
-    gap: $space-xs;
+    gap: $space-sm;
   }
 
   &__history-action {
@@ -341,13 +340,10 @@ onBeforeUnmount(() => {
     flex: 1;
   }
 
-  &__title-input {
-    font-size: $font-size-lg;
-  }
-
   &__section-title {
     margin: 0;
-    font-size: $font-size-lg;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
   }
 
   &__header {
@@ -355,7 +351,7 @@ onBeforeUnmount(() => {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: $space-xs;
+    gap: $space-sm;
     margin-bottom: $space-md;
   }
 
@@ -370,7 +366,7 @@ onBeforeUnmount(() => {
 
   &__todos {
     display: grid;
-    gap: $space-xs;
+    gap: $space-sm;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -402,7 +398,7 @@ onBeforeUnmount(() => {
     flex-wrap: wrap;
     align-items: center;
     gap: $space-sm;
-    padding-top: $space-xl;
+    padding-top: $space-lg;
     border-top: $border-width solid $color-border;
   }
 
@@ -415,19 +411,15 @@ onBeforeUnmount(() => {
   }
 
   @media (max-width: $breakpoint-mobile) {
-    gap: $space-xl;
+    gap: $space-lg;
     padding: $space-md;
-
-    &__history-action {
-      --ui-button-padding: #{$space-xs} #{$space-2xs};
-    }
 
     &__primary-actions {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: stretch;
       flex-basis: 100%;
-      gap: $space-xs;
+      gap: $space-sm;
     }
   }
 }

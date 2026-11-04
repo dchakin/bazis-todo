@@ -189,11 +189,11 @@ onBeforeUnmount(() => {
 @use '~/assets/styles/variables' as *;
 
 .confirm-dialog {
-  width: min(100% - $space-2xl, $dialog-max-width);
-  max-height: calc(100dvh - $space-2xl);
-  padding: $space-2xl;
+  width: min(100% - $space-xl, $dialog-max-width);
+  max-height: calc(100dvh - $space-xl);
+  padding: $space-lg;
   border: $border-width solid $color-border;
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   color: inherit;
   box-shadow: $shadow-dialog;
   overflow-wrap: anywhere;
@@ -223,7 +223,7 @@ onBeforeUnmount(() => {
   &__icon {
     display: inline-flex;
     padding: $space-md;
-    margin-bottom: $space-xl;
+    margin-bottom: $space-lg;
     border-radius: $radius-md;
     color: $accent;
     background-color: $color-accent-background;
@@ -236,7 +236,8 @@ onBeforeUnmount(() => {
 
   &__title {
     margin: 0;
-    font-size: $font-size-xl;
+    font-size: $font-size-title;
+    font-weight: $font-weight-semibold;
     line-height: $line-height-title;
 
     &:focus {
@@ -245,7 +246,7 @@ onBeforeUnmount(() => {
   }
 
   &__message {
-    margin: $space-md 0 $space-xl;
+    margin: $space-md 0 $space-lg;
     color: $color-text-muted;
     white-space: pre-wrap;
   }
@@ -257,11 +258,7 @@ onBeforeUnmount(() => {
   }
 
   @media (max-width: $breakpoint-mobile) {
-    padding: $space-xl;
-
-    &__actions {
-      gap: $space-xs;
-    }
+    padding: $space-md;
   }
 }
 </style>

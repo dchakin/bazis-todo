@@ -52,7 +52,7 @@ const textError = computed(() => {
         variant="plain"
         multiline
         auto-grow
-        placeholder="Что нужно сделать?"
+        placeholder="Текст задачи"
         required
         :aria-label="`Задача ${index + 1}`"
         @blur="emit('blur')"
@@ -78,8 +78,8 @@ const textError = computed(() => {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: start;
-  gap: $space-2xs;
-  padding: $space-xs;
+  gap: $space-xs;
+  padding: $space-sm;
   border: $border-width solid $color-border;
   border-radius: $radius-md;
   background-color: $color-surface;
@@ -115,11 +115,7 @@ const textError = computed(() => {
   }
 
   @media (max-width: $breakpoint-mobile) {
-    padding: $space-2xs;
-
-    &__text {
-      padding-inline: $space-xs;
-    }
+    padding: $space-xs;
   }
 }
 </style>

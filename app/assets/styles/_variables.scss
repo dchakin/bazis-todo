@@ -20,19 +20,17 @@ $color-focus-ring: color.change($accent, $alpha: 0.2);
 $color-danger-focus-ring: color.change($color-danger, $alpha: 0.2);
 $color-accent-background: color.change($accent, $alpha: 0.08);
 $shadow-surface: 0 4px 24px color.change($color-text, $alpha: 0.04);
+$shadow-surface-hover: 0 8px 28px color.change($color-text, $alpha: 0.08);
 $shadow-dialog: 0 16px 64px color.change($color-text, $alpha: 0.16);
 
-$space-2xs: 0.25rem;
-$space-xs: 0.5rem;
-$space-sm: 0.75rem;
+$space-xs: 0.25rem;
+$space-sm: 0.5rem;
 $space-md: 1rem;
-$space-xl: 1.5rem;
-$space-2xl: 2rem;
-$space-3xl: 3rem;
+$space-lg: 1.5rem;
+$space-xl: 2rem;
 
 $radius-sm: 0.5rem;
 $radius-md: 0.75rem;
-$radius-lg: 1rem;
 
 $border-width: 1px;
 $focus-ring-width: 3px;
@@ -40,16 +38,15 @@ $focus-outline-offset: 4px;
 
 $font-family-base: system-ui, sans-serif;
 $font-size-sm: 0.875rem;
-$font-size-lg: 1.25rem;
-$font-size-xl: 1.5rem;
-$font-size-2xl: 2rem;
+$font-size-base: 1rem;
+$font-size-title: 1.5rem;
 $font-weight-semibold: 600;
 $line-height-base: 1.5;
 $line-height-title: 1.25;
 
 $layout-min-width: 320px;
 $layout-max-width: 64rem;
-$editor-max-width: 46rem;
+$editor-max-width: 42rem;
 $breakpoint-mobile: 540px;
 $card-min-width: 18rem;
 $dialog-max-width: 28rem;
@@ -64,4 +61,3 @@ $motion-slow: 220ms;
 $motion-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
 $motion-card-lift: -2px;
 $motion-press-offset: 1px;
-$shadow-surface-hover: 0 8px 28px color.change($color-text, $alpha: 0.08);

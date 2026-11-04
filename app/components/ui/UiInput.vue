@@ -136,7 +136,7 @@ defineExpose({
   width: 100%;
   min-width: 0;
   min-height: var(--ui-input-min-height, #{$control-min-height});
-  padding: var(--ui-input-padding, #{$space-xs} #{$space-sm});
+  padding: var(--ui-input-padding, #{$space-sm});
   border: $border-width solid var(--ui-input-border-color, #{$color-input-border});
   border-radius: var(--ui-input-radius, #{$radius-sm});
   color: var(--ui-input-text-color, inherit);

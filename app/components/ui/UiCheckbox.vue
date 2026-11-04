@@ -65,7 +65,7 @@ defineExpose({
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--ui-checkbox-gap, #{$space-xs});
+  gap: var(--ui-checkbox-gap, #{$space-sm});
   min-width: var(--ui-checkbox-min-size, #{$control-min-height});
   min-height: var(--ui-checkbox-min-size, #{$control-min-height});
   cursor: pointer;

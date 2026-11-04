@@ -32,7 +32,7 @@ const emit = defineEmits<{
 @use '~/assets/styles/variables' as *;
 
 .error-notice {
-  margin-block: $space-xl;
+  margin-block: $space-lg;
   padding: $space-md;
   border: $border-width solid $color-danger-border;
   border-radius: $radius-sm;

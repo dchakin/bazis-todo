@@ -1,6 +1,11 @@
 @use './variables' as *;
 
 :root {
+  --motion-fast: #{$motion-fast};
+  --motion-normal: #{$motion-normal};
+  --motion-slow: #{$motion-slow};
+  --motion-easing: #{$motion-easing};
+
   font-family: $font-family-base;
   line-height: $line-height-base;
   color: $color-text;
@@ -96,4 +101,22 @@ body {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+@keyframes surface-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-normal: 0ms;
+    --motion-slow: 0ms;
+  }
 }

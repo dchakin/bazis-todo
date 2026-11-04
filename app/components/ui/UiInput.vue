@@ -142,6 +142,12 @@ defineExpose({
   color: var(--ui-input-text-color, inherit);
   background-color: var(--ui-input-background-color, #{$color-surface});
 
+  transition:
+    color var(--motion-normal) var(--motion-easing),
+    border-color var(--motion-fast) var(--motion-easing),
+    background-color var(--motion-fast) var(--motion-easing),
+    box-shadow var(--motion-fast) var(--motion-easing);
+
   &--plain {
     --ui-input-border-color: transparent;
     --ui-input-background-color: transparent;

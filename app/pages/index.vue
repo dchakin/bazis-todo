@@ -21,7 +21,7 @@ useHead({
 </script>
 
 <template>
-  <section>
+  <section class="page">
     <header class="page__header">
       <h1
         class="page__title"
@@ -46,8 +46,11 @@ useHead({
       @retry="notesStore.loadNotes()"
     />
 
-    <div
+    <TransitionGroup
       v-if="notesStore.notes.length"
+      tag="div"
+      :css="false"
+      move-class="page__note-move"
       class="page__notes"
     >
       <NoteCard
@@ -56,7 +59,7 @@ useHead({
         :note="note"
         @delete="pendingDelete = $event"
       />
-    </div>
+    </TransitionGroup>
 
     <div
       v-else-if="!notesStore.error"
@@ -97,6 +100,12 @@ useHead({
 @use '~/assets/styles/variables' as *;
 
 .page {
+  animation: surface-enter var(--motion-normal) var(--motion-easing);
+
+  &__notes > &__note-move {
+    transition: transform var(--motion-slow) var(--motion-easing);
+  }
+
   &__notes {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, $card-min-width), 1fr));

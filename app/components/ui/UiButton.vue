@@ -109,6 +109,21 @@ defineExpose({
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
   white-space: nowrap;
+  transition:
+    background-color var(--motion-fast) var(--motion-easing),
+    border-color var(--motion-fast) var(--motion-easing),
+    color var(--motion-fast) var(--motion-easing),
+    transform var(--motion-fast) var(--motion-easing);
+
+  &:active:not(:disabled):not([aria-disabled='true']) {
+    transform: translateY($motion-press-offset);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:active {
+      transform: none;
+    }
+  }
 
   &:hover {
     border-color: var(--ui-button-hover-border-color, var(--ui-button-border-color, transparent));

@@ -139,6 +139,22 @@ const editorPath = computed(() => {
   background-color: $color-surface;
   box-shadow: $shadow-surface;
 
+  transition:
+    translate var(--motion-normal) var(--motion-easing),
+    border-color var(--motion-fast) var(--motion-easing),
+    box-shadow var(--motion-normal) var(--motion-easing);
+
+  &:focus-within {
+    border-color: $accent;
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    &:hover:not([inert]) {
+      translate: 0 $motion-card-lift;
+      box-shadow: $shadow-surface-hover;
+    }
+  }
+
   &__header {
     display: flex;
     align-items: flex-start;

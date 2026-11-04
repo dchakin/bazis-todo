@@ -388,6 +388,7 @@ useHead({
 @use '~/assets/styles/variables' as *;
 
 .note-page {
+  animation: surface-enter var(--motion-normal) var(--motion-easing);
   max-width: $editor-max-width;
   margin-inline: auto;
 

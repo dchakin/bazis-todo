@@ -23,12 +23,53 @@ const cancelButton = useTemplateRef('cancelButton')
 const confirmButton = useTemplateRef('confirmButton')
 const titleId = useId()
 const messageId = useId()
+const pendingAction = ref<'confirm' | 'cancel' | null>(null)
 
 let previousFocus: HTMLElement | null = null
 let previousOverflow = ''
 
+function focusInitial() {
+  const target = initialFocus === 'title' ? titleElement.value : cancelButton.value
+
+  target?.focus()
+}
+
+function choose(action: 'confirm' | 'cancel') {
+  if (pendingAction.value) {
+    return
+  }
+
+  pendingAction.value = action
+
+  titleElement.value?.focus()
+}
+
+function finishChoice() {
+  const action = pendingAction.value
+
+  pendingAction.value = null
+
+  if (!dialog.value?.open || !action) {
+    return
+  }
+
+  if (action === 'confirm') {
+    emit('confirm')
+  } else {
+    emit('cancel')
+  }
+
+  nextTick(focusInitial)
+}
+
 function trapFocus(event: KeyboardEvent) {
   if (event.key !== 'Tab') {
+    return
+  }
+
+  if (pendingAction.value) {
+    event.preventDefault()
+
     return
   }
 
@@ -61,14 +102,12 @@ onMounted(() => {
 
   dialog.value?.showModal()
 
-  if (initialFocus === 'title') {
-    titleElement.value?.focus()
-  } else {
-    cancelButton.value?.focus()
-  }
+  focusInitial()
 })
 
 onBeforeUnmount(() => {
+  pendingAction.value = null
+
   dialog.value?.close()
   document.body.style.overflow = previousOverflow
 
@@ -83,57 +122,67 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <dialog
-    ref="dialog"
-    class="confirm-dialog"
-    :aria-labelledby="titleId"
-    :aria-describedby="messageId"
-    @cancel.prevent="emit('cancel')"
-    @keydown="trapFocus"
+  <Transition
+    name="confirm-dialog--fade"
+    appear
+    @after-leave="finishChoice"
   >
-    <span
-      class="confirm-dialog__icon"
-      :class="danger ? 'confirm-dialog__icon--danger' : undefined"
+    <dialog
+      v-show="!pendingAction"
+      ref="dialog"
+      class="confirm-dialog"
+      :aria-busy="Boolean(pendingAction) || undefined"
+      :aria-labelledby="titleId"
+      :aria-describedby="messageId"
+      @cancel.prevent="choose('cancel')"
+      @keydown="trapFocus"
     >
-      <UiIcon :name="danger ? 'warning' : 'notebook'" />
-    </span>
-
-    <h2
-      :id="titleId"
-      ref="titleElement"
-      class="confirm-dialog__title"
-      :tabindex="initialFocus === 'title' ? -1 : undefined"
-      :autofocus="initialFocus === 'title'"
-    >
-      {{ title }}
-    </h2>
-
-    <p
-      :id="messageId"
-      class="confirm-dialog__message"
-    >
-      {{ message }}
-    </p>
-
-    <div class="confirm-dialog__actions">
-      <UiButton
-        ref="cancelButton"
-        variant="secondary"
-        :autofocus="initialFocus === 'cancel'"
-        @click="emit('cancel')"
+      <span
+        class="confirm-dialog__icon"
+        :class="danger ? 'confirm-dialog__icon--danger' : undefined"
       >
-        {{ cancelLabel }}
-      </UiButton>
+        <UiIcon :name="danger ? 'warning' : 'notebook'" />
+      </span>
 
-      <UiButton
-        ref="confirmButton"
-        :variant="danger ? 'danger' : 'primary'"
-        @click="emit('confirm')"
+      <h2
+        :id="titleId"
+        ref="titleElement"
+        class="confirm-dialog__title"
+        tabindex="-1"
+        :autofocus="initialFocus === 'title'"
       >
-        {{ confirmLabel }}
-      </UiButton>
-    </div>
-  </dialog>
+        {{ title }}
+      </h2>
+
+      <p
+        :id="messageId"
+        class="confirm-dialog__message"
+      >
+        {{ message }}
+      </p>
+
+      <div class="confirm-dialog__actions">
+        <UiButton
+          ref="cancelButton"
+          variant="secondary"
+          :autofocus="initialFocus === 'cancel'"
+          :disabled="Boolean(pendingAction)"
+          @click="choose('cancel')"
+        >
+          {{ cancelLabel }}
+        </UiButton>
+
+        <UiButton
+          ref="confirmButton"
+          :variant="danger ? 'danger' : 'primary'"
+          :disabled="Boolean(pendingAction)"
+          @click="choose('confirm')"
+        >
+          {{ confirmLabel }}
+        </UiButton>
+      </div>
+    </dialog>
+  </Transition>
 </template>
 
 <style scoped lang="scss">
@@ -151,6 +200,24 @@ onBeforeUnmount(() => {
 
   &::backdrop {
     background-color: $color-dialog-backdrop;
+  }
+
+  &--fade-enter-active,
+  &--fade-leave-active {
+    transition: opacity var(--motion-normal) var(--motion-easing);
+
+    &::backdrop {
+      transition: opacity var(--motion-normal) var(--motion-easing);
+    }
+  }
+
+  &--fade-enter-from,
+  &--fade-leave-to {
+    opacity: 0;
+
+    &::backdrop {
+      opacity: 0;
+    }
   }
 
   &__icon {

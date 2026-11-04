@@ -248,8 +248,11 @@ onBeforeUnmount(() => {
         </span>
       </div>
 
-      <ul
+      <TransitionGroup
         v-if="draft.todos.length"
+        tag="ul"
+        :css="false"
+        move-class="note-editor__todo-move"
         class="note-editor__todos"
       >
         <TodoRow
@@ -265,7 +268,7 @@ onBeforeUnmount(() => {
           @blur="history.finishTextEdit"
           @remove="removeTodo(todo.id)"
         />
-      </ul>
+      </TransitionGroup>
 
       <div
         v-else
@@ -333,6 +336,8 @@ onBeforeUnmount(() => {
   }
 
   &__history-action {
+    --ui-button-padding: #{$space-sm} #{$space-xs};
+
     flex: 1;
   }
 
@@ -357,6 +362,10 @@ onBeforeUnmount(() => {
   &__count {
     color: $color-text-muted;
     font-size: $font-size-sm;
+  }
+
+  &__todos > &__todo-move {
+    transition: transform var(--motion-slow) var(--motion-easing);
   }
 
   &__todos {
@@ -399,7 +408,7 @@ onBeforeUnmount(() => {
 
   &__primary-actions {
     display: flex;
-    flex: 1;
+    flex: 1 0 auto;
     flex-wrap: wrap;
     align-items: center;
     gap: $space-sm;

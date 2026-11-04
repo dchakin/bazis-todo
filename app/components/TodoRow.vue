@@ -28,7 +28,10 @@ const textError = computed(() => {
 </script>
 
 <template>
-  <li class="todo-row">
+  <li
+    class="todo-row"
+    :class="completed ? 'todo-row--completed' : undefined"
+  >
     <UiCheckbox
       v-model="completed"
       class="todo-row__toggle"
@@ -80,6 +83,12 @@ const textError = computed(() => {
   border: $border-width solid $color-border;
   border-radius: $radius-md;
   background-color: $color-surface;
+  animation: surface-enter var(--motion-normal) var(--motion-easing);
+  transition: background-color var(--motion-normal) var(--motion-easing);
+
+  &--completed {
+    background-color: $color-accent-background;
+  }
 
   &__toggle {
     grid-column: 1;
@@ -92,8 +101,10 @@ const textError = computed(() => {
   }
 
   &__text {
+    --ui-input-text-color: #{$color-text};
+
     &--completed {
-      color: $color-text-muted;
+      --ui-input-text-color: #{$color-text-muted};
       text-decoration: line-through;
     }
   }
